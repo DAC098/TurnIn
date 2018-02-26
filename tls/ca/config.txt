@@ -1,0 +1,15 @@
+[ req ]
+default_bits = 2048
+distinguished_name = req_distinguished_name
+prompt = no
+req_ext = req_ext
+
+[ req_distinguished_name ]
+CN = tds-svr
+O = tds
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = tds-svr

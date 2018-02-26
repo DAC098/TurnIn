@@ -1,0 +1,60 @@
+{
+  "name": "turnin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "Router": "git+https://github.com/dac098/Router.git",
+    "chalk": "^2.1.0",
+    "classnames": "^2.2.5",
+    "cookie": "^0.3.1",
+    "js-yaml": "^3.9.1",
+    "lodash": "^4.17.4",
+    "mime": "^2.0.3",
+    "minimatch": "^3.0.4",
+    "moment": "^2.18.1",
+    "pg": "^7.4.0",
+    "prop-types": "^15.5.10",
+    "pump": "^2.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-motion": "^0.5.0",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.1.2",
+    "react-router-dom": "^4.1.2",
+    "redis": "^2.8.0",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.0.3",
+    "styled-components": "^2.1.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-dynamic-import-node": "^1.0.2",
+    "babel-plugin-dynamic-import-webpack": "^1.0.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-preset-babili": "^0.1.4",
+    "babel-preset-react": "^6.24.1",
+    "babili-webpack-plugin": "^0.1.2",
+    "bundle-loader": "^0.5.5",
+    "chokidar": "^1.7.0",
+    "webpack": "^3.5.4",
+    "webpack-manifest-plugin": "^1.3.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dac098/TurnIn.git"
+  },
+  "author": "David Cathers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dac098/TurnIn/issues"
+  },
+  "homepage": "https://github.com/dac098/TurnIn#readme"
+}
