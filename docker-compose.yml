@@ -19,7 +19,7 @@ services:
     ports:
       - "443:443"
     restart: unless-stopped
-    command: "node --experimental-modules --harmony-dynamic-import ./server/index.mjs"
+    command: "node ./server/index.js"
   socket:
     image: "node:9.6.1"
     depends_on:
@@ -30,7 +30,7 @@ services:
     ports:
       - "8443:8443"
     restart: unless-stopped
-    command: "node --experimental-modules --harmony-dynamic-import ./socker/index.mjs"
+    command: "node ./socket/index.js"
   redis:
     image: "redis:4.0.6"
     expose:
