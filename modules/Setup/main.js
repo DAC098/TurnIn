@@ -1,4 +1,6 @@
-import _ from 'lodash';
+const util = require('util');
+
+const _ = require('lodash');
 
 const data_sym = Symbol('data');
 
@@ -12,11 +14,11 @@ class Setup {
 		let ref = this[data_sym];
 
 		for(let i = 0, l = path.length; i < l - 1; ++i) {
-			if(!(path[key] in ref)) {
-				ref[path[key]] = {};
+			if(!(path[i] in ref)) {
+				ref[path[i]] = {};
 			}
 
-			ref = ref[path[key]];
+			ref = ref[path[i]];
 		}
 
 		if(path.length > 1) {
@@ -32,10 +34,10 @@ class Setup {
 		let ref = this[data_sym];
 
 		for(let i = 0, l = path.length; i < l - 1; ++i) {
-			if(!(path[key] in ref))
-				ref[path[key]] = {};
+			if(!(path[i] in ref))
+				ref[path[i]] = {};
 
-			ref = ref[path[key]];
+			ref = ref[path[i]];
 		}
 
 		ref = _.merge({},ref,obj);
@@ -46,18 +48,18 @@ class Setup {
 		let ref = this[data_sym];
 
 		for (let i = 0, l = path.length; i < l - 1; ++i) {
-			if(!(path[key] in ref)) {
+			if(!(path[i] in ref)) {
 				return undefined;
 			}
 
-			ref = ref[path[key]];
+			ref = ref[path[i]];
 		}
 
 		if(ref[path[path.length - 1]] !== null && ref[path[path.length - 1]] !== undefined)
-			return _.cloneDeep(ref[path.length - 1]);
+			return _.cloneDeep(ref[path[path.length - 1]]);
 		else
 			return undefined;
 	}
 }
 
-export default Setup;
+module.exports = Setup;

@@ -4,6 +4,9 @@ ignore
 # files
 *.ignore*
 
+# ide
+.idea
+
 # Logs
 logs
 *.log

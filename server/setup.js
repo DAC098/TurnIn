@@ -1,7 +1,7 @@
-import process from 'process';
-import path from 'path';
+const process = require('process');
+const path = require('path');
 
-import Setup from '../modules/Setup/main.mjs';
+const Setup = require('../modules/Setup/main');
 
 const root = process.cwd();
 
@@ -28,4 +28,4 @@ const setup = new Setup({
 	}
 });
 
-export default setup;
+module.exports = setup;
