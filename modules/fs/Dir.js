@@ -19,7 +19,8 @@ const read_default = {
 	depth: 0,
 	with_stats: false,
 	include_file: true,
-	include_dir: true
+	include_dir: true,
+	single_list: false
 };
 
 function getStatType(stats) {
@@ -44,7 +45,7 @@ function getReadStats(path,opt,stats) {
 }
 
 async function rRead(path,opt) {
-	let found = {
+	let found = opt.single_list ? [] : {
 		files: [],
 		directories: []
 	};
@@ -58,23 +59,40 @@ async function rRead(path,opt) {
 			if(stats.isDirectory()) {
 				if(opt.depth !== 0) {
 					--opt.depth;
-					if(opt.include_dir)
-						found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					if(opt.include_dir) {
+						if(opt.single_list)
+							found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+						else
+							found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					}
 
 					let res = await rRead(item_path,opt);
 
-					if(opt.include_dir)
-						found.directories = found.directories.concat(res.directories);
+					if(opt.single_list) {
+						found = found.concat(res);
+					} else {
+						if(opt.include_dir)
+							found.directories = found.directories.concat(res.directories);
 
-					if(opt.include_file)
-						found.files = found.files.concat(res.files);
+						if(opt.include_file)
+							found.files = found.files.concat(res.files);
+					}
 				} else {
-					if(opt.include_dir)
-						found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					if(opt.include_dir) {
+						if(opt.single_list)
+							found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+						else
+							found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					}
 				}
-			} else if(stats.isFile())
-				if(opt.include_file)
-					found.files.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+			} else if(stats.isFile()) {
+				if(opt.include_file) {
+					if(opt.single_list)
+						found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					else
+						found.files.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+				}
+			}
 		}
 	}
 
@@ -82,7 +100,7 @@ async function rRead(path,opt) {
 }
 
 function rReadSync(path,opt) {
-	let found = {
+	let found = opt.single_list ? [] : {
 		files: [],
 		directories: []
 	};
@@ -97,23 +115,40 @@ function rReadSync(path,opt) {
 				if(opt.depth !== 0) {
 					--opt.depth;
 
-					if(opt.include_dir)
-						found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					if(opt.include_dir) {
+						if(opt.single_list)
+							found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+						else
+							found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					}
 
 					let res = rReadSync(item_path,opt);
 
-					if(opt.include_dir)
-						found.directories = found.directories.concat(res.directories);
+					if(opt.single_list) {
+						found = found.concat(res);
+					} else {
+						if(opt.include_dir)
+							found.directories = found.directories.concat(res.directories);
 
-					if(opt.include_file)
-						found.files = found.files.concat(res.files);
+						if(opt.include_file)
+							found.files = found.files.concat(res.files);
+					}
 				} else {
-					if(opt.include_dir)
-						found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					if(opt.include_dir) {
+						if(opt.single_list)
+							found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+						else
+							found.directories.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					}
 				}
-			} else if(stats.isFile())
-				if(opt.include_file)
-					found.files.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+			} else if(stats.isFile()) {
+				if(opt.include_file) {
+					if(opt.single_list)
+						found.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+					else
+						found.files.push(opt.with_stats ? getReadStats(item_path,opt,stats) : item_path);
+				}
+			}
 		}
 	}
 
@@ -157,29 +192,7 @@ class Dir {
 		let found = [];
 		opt = merge({},read_default,opt);
 
-		try {
-			let contents = nFS.readdirSync(path);
-
-			for(let item of contents) {
-				let item_path = nPath.join(path,item);
-				let stats = nFS.lstatSync(item_path);
-
-				if(!common.runcheck(item_path,opt.ignore)) {
-					if(stats.isDirectory()) {
-						if(opt.depth !== 0)
-							found = found.concat(Dir.readSync(item_path,opt));
-						else
-							found.push(item_path);
-					}
-					else if(stats.isFile())
-						found.push(item_path);
-				}
-			}
-
-			return found;
-		} catch(err) {
-			throw err;
-		}
+		return rReadSync(path,opt);
 	}
 
 	static async make(path,mode) {

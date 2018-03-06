@@ -27,6 +27,7 @@ services:
       - psql
     volumes:
       - "./:/app"
+    working_dir: "/app"
     ports:
       - "8443:8443"
     restart: unless-stopped

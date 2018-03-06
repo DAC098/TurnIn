@@ -1,0 +1,5 @@
+order:
+  - "nested.js"
+  - "nested"
+  - "close.js"
+  - "catch_all.js"
