@@ -7,6 +7,10 @@ const router = require('./router');
 log.info('routes:',global_router.routerStructure(router));
 
 const handle = async (req,res) => {
+	res['endJSON'] = function(obj) {
+		this.end(JSON.stringify(obj));
+	};
+
 	try {
 		log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}`);
 
@@ -28,7 +32,9 @@ const handle = async (req,res) => {
 	} catch(err) {
 		log.error(err.stack);
 		res.writeHead(500,{'content-type':'text/plain'});
-		res.end(err.stack);
+		res.endJSON({
+			'message': 'server error'
+		});
 	}
 };
 
