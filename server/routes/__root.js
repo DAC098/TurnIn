@@ -3,6 +3,19 @@ const parseText = require('../parser/text');
 module.exports = [
 	[
 		{
+			type: 'mdlwr',
+			path: '/',
+			methods: ['get','post','put','delete'],
+			regex: /\//
+		},
+		async (req,res) => {
+			res['endJSON'] = function(obj) {
+				this.end(JSON.stringify(obj));
+			};
+		}
+	],
+	[
+		{
 			path: '/',
 			methods: 'post'
 		},
@@ -22,4 +35,4 @@ module.exports = [
 			res.end(JSON.stringify({'message':'ok','page':'root'}));
 		}
 	]
-]
+];

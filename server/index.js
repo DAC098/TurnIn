@@ -1,5 +1,7 @@
-const setup = require('./setup');
-
+const setup = require('modules/setup');
+const log = require('modules/log');
 (async () => {
-  const server = require('./main');
+	log.setName('server');
+
+	const server = require('./main');
 })();

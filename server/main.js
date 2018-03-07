@@ -1,7 +1,9 @@
 const http2 = require('http2');
 const fs = require('fs');
 
-const setup = require('./setup');
+const setup = require('modules/setup');
+const log = require('modules/log');
+
 const handle = require('./handle');
 
 const opts = {
@@ -14,9 +16,9 @@ const server = http2.createSecureServer(opts, handle);
 
 server.on('listening',err => {
 	if(err)
-		console.error(err.stack);
+		log.error(err.stack);
 	else
-		console.log('server listening for connections, https://0.0.0.0:443');
+		log.info('server listening for connections, https://0.0.0.0:443');
 });
 
 server.listen(443,'0.0.0.0');

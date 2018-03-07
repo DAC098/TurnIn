@@ -1,5 +1,8 @@
 order:
-  - "nested.js"
-  - "nested"
+  - "html.js"
+  - "assets.js"
+  - "login.js"
+  - "students"
+  - "images"
+  - "assignments"
   - "close.js"
-  - "catch_all.js"

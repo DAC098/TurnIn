@@ -4,8 +4,8 @@ const Router = require('Router');
 const global = require('Router/global');
 const _ = require('lodash');
 
-const Dir = require('../modules/fs/Dir');
-const File = require('../modules/fs/File');
+const Dir = require('modules/fs/Dir');
+const File = require('modules/fs/File');
 
 // global.on('endpoint', (...args) => {
 //   console.log('endpoint:',...args);
@@ -37,7 +37,7 @@ let dir_list = Dir.readSync(path.join(__dirname,'./routes'), {
 
 const isNotLoadFile = file => {
 	return !(file.name === '__root.js' || file.name === '__load.yaml' || file.name === '__mount.yaml' || file.name === '__mount.js');
-}
+};
 
 const loadRoute = (router_instance, file) => {
 	let routes = require(file.base + file.item);
@@ -53,7 +53,7 @@ const loadRoute = (router_instance, file) => {
 				router_instance.addRoute(...r);
 		}
 	}
-}
+};
 
 const loadMount = (router_instance, file) => {
 	let list = Dir.readSync(file.base + file.item,{
@@ -77,7 +77,7 @@ const loadMount = (router_instance, file) => {
 	loadDirectory(n_router,list);
 
 	router_instance.addMount(mount_data,[...mount_middleware,n_router]);
-}
+};
 
 const loadRoot = (router_instance, list) => {
 	for(let file of list) {
@@ -85,7 +85,7 @@ const loadRoot = (router_instance, list) => {
 			loadRoute(router_instance, file);
 		}
 	}
-}
+};
 
 const loadFiles = (router_instance, list) => {
 	for(let file of list) {
@@ -95,7 +95,7 @@ const loadFiles = (router_instance, list) => {
 			loadMount(router_instance, file)
 		}
 	}
-}
+};
 
 const findFileIndex = (list, search) => {
 	for(let i = 0,l = list.length; i < l; ++i) {
@@ -106,7 +106,7 @@ const findFileIndex = (list, search) => {
 	}
 
 	return -1;
-}
+};
 
 const loadOrderedFiles = (router_instance, list, order) => {
 	for(let file_name of order) {
@@ -122,7 +122,7 @@ const loadOrderedFiles = (router_instance, list, order) => {
 			}
 		}
 	}
-}
+};
 
 const loadDirectory = (router_instance,list) => {
 	let found_load_order = false;
@@ -142,7 +142,7 @@ const loadDirectory = (router_instance,list) => {
 	if(!found_load_order) {
 		loadFiles(router_instance, list);
 	}
-}
+};
 
 loadDirectory(router, dir_list);
 

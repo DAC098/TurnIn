@@ -1,7 +1,7 @@
 module.exports = [
 	[
 		{
-			path: '/nested',
+			path: '/',
 			methods: 'get'
 		},
 		async (req,res) => {
@@ -9,4 +9,4 @@ module.exports = [
 			res.end('ok');
 		}
 	]
-]
+];
