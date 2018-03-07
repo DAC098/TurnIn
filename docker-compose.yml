@@ -7,7 +7,7 @@ services:
     volumes:
       - "./:/app"
     working_dir: "/app"
-    command: "./node_modules/.bin/webpack --config webpack.config.js"
+    command: "./node_modules/.bin/webpack --config webpack.config.js --watch"
   server:
     image: "node:9.6.1"
     depends_on:
@@ -29,7 +29,7 @@ services:
       - "./:/app"
     working_dir: "/app"
     ports:
-      - "8443:8443"
+      - "8443:443"
     restart: unless-stopped
     command: "node ./socket/index.js"
   redis:
