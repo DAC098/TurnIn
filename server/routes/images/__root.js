@@ -5,8 +5,8 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
-			res.writeHead(200,{'content-type':'text/plain'});
-			res.end('ok');
+			res.writeHead(200,{'content-type':'application/json'});
+			res.endJSON({'message':'ok'});
 		}
 	]
 ];
