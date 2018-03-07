@@ -4,8 +4,6 @@ const log = require('modules/log');
 
 const router = require('./router');
 
-log.info('routes:',global_router.routerStructure(router));
-
 const handle = async (req,res) => {
 	res['endJSON'] = function(obj) {
 		this.end(JSON.stringify(obj));
