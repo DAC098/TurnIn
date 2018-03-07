@@ -60,6 +60,10 @@ class Setup {
 		else
 			return undefined;
 	}
+
+	get() {
+		return _.cloneDeep(this[data_sym]);
+	}
 }
 
 module.exports = Setup;
