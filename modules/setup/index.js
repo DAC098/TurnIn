@@ -1,7 +1,7 @@
 const process = require('process');
 const path = require('path');
 
-const Setup = require('../modules/Setup/main');
+const Setup = require('./Setup');
 
 const root = process.cwd();
 
