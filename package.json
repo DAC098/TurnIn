@@ -12,6 +12,7 @@
     "lodash": "^4.17.4",
     "mime": "^2.0.3",
     "minimatch": "^3.0.4",
+    "modules": "file:modules",
     "moment": "^2.18.1",
     "pg": "^7.4.0",
     "prop-types": "^15.5.10",
