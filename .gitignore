@@ -1,5 +1,6 @@
 # folders
 ignore
+assets/scripts
 
 # files
 *.ignore*
