@@ -118,7 +118,15 @@ class Log {
 	}
 
 	getPrefix() {
-		return `${this.options.show_time ? `[${moment().toISOString()}] ` : ''}${this.has_name ? `${this.name}` : ':'}`;
+		return `${this.options.show_time ? `{${moment().toISOString()}} ` : ''}${this.has_name ? `${this.name}` : ':'}`;
+	}
+
+	setName(name) {
+		let p = Log.parseName(name);
+
+		this.has_name = p.has_name;
+		this.name_list = p.name_list;
+		this.name = p.name;
 	}
 
 	info(...args) {
