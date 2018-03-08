@@ -2,19 +2,20 @@ const process = require('process');
 const path = require('path');
 
 const Setup = require('./Setup');
+const File = require('../fs/File');
 
 const traverseKeys = obj => {
-	let rtn = new Set();
+	let rtn = new Map();
 
 	for(let k in obj) {
 		if(typeof obj[k] === 'object') {
 			let t = traverseKeys(obj[k]);
 
-			for(let tk of t) {
-				rtn.add(`${k}.${tk}`);
+			for(let [tk,tv] of t) {
+				rtn.set(`${k}.${tk}`,tv);
 			}
 		} else {
-			rtn.add(k);
+			rtn.set(k,obj[k]);
 		}
 	}
 
@@ -25,7 +26,7 @@ const cliValidNames = obj => {
 	let keys = new Set();
 	let found = traverseKeys(obj);
 
-	for(let k of found) {
+	for(let [k,v] of found) {
 		keys.add(`--c-${k}`);
 	}
 
@@ -56,12 +57,15 @@ const default_setup = {
 		port: 5432,
 		username: 'postgres',
 		password: 'password'
+	},
+	security: {
+		secret: 'secret'
 	}
 };
 const valid_cli_names = cliValidNames(default_setup);
 const setup = new Setup(default_setup);
 
-const processCliArgs = () => {
+const processCliArgs = async () => {
 	let set_keys = new Set();
 
 	for(let i = 0,l = process.argv.length; i < l; ++i) {
@@ -74,6 +78,31 @@ const processCliArgs = () => {
 				setup.setKey(key_path,process.argv[i + 1]);
 				set_keys.add(arg);
 				++i;
+			}
+		} else if(arg === '-c' || arg === '--config') {
+			if(typeof process.argv[i + 1] !== 'undefined') {
+				let file_path = process.argv[i + 1];
+				let file_data = {};
+				++i;
+
+				if(!await File.exists(file_path))
+					continue;
+
+				switch(path.extname(file_path)) {
+					case ".yaml":
+					case ".yml":
+						file_data = await File.loadYaml(file_path);
+						break;
+					case ".json":
+						file_data = JSON.parse(await File.read(file_path));
+						break;
+				}
+
+				let keys = traverseKeys(file_data);
+
+				for(let [k,v] of keys) {
+					setup.setKey(k,v);
+				}
 			}
 		}
 	}
