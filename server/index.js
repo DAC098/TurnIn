@@ -7,7 +7,7 @@ const log = require('modules/log');
 	log.setName('server');
 
 	log.info('processing cli arguments');
-	setup.processCliArgs();
+	await setup.processCliArgs();
 
 	log.info('starting server');
 	const server = require('./main');

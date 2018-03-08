@@ -7,7 +7,7 @@ const log = require('modules/log');
 	log.setName('socket');
 
 	log.info('processing cli arguments');
-	setup.processCliArgs();
+	await setup.processCliArgs();
 
 	log.info('starting server');
 	let socket = require('./main');
