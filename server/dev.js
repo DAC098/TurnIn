@@ -19,7 +19,7 @@ const shouldRestart = list => {
 	return false;
 };
 
-log.debug('watching directory',{dir:watch_dir});
+// log.debug('watching directory',{dir:watch_dir});
 
 const watcher = chokidar.watch(watch_dir,{
 	ignoreInitial: true,
@@ -28,6 +28,10 @@ const watcher = chokidar.watch(watch_dir,{
 		'**/.git/**',
 		'**/.idea/**'
 	]
+});
+
+watcher.on('ready',() => {
+	log.info('dev watcher ready');
 });
 
 watcher.on('error', err => {
@@ -44,7 +48,7 @@ watcher.on('change', p => {
 		clearTimeout(timer);
 
 		if(shouldRestart(change_list)) {
-			log.info('closing');
+			log.info('file update, closing server');
 			process.exit(0);
 		}
 
