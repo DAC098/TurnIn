@@ -17,6 +17,9 @@ services:
       - psql
     volumes:
       - "./:/app"
+      - "../_configs/turnin:/etc/turnin"
+      - "../_data/turnin:/var/lib/turnin/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     working_dir: "/app"
     environment:
       - "NODE_ENV=development"
@@ -31,6 +34,9 @@ services:
       - psql
     volumes:
       - "./:/app"
+      - "../_configs/turnin:/etc/turnin"
+      - "../_data/turnin:/var/lib/turnin/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     working_dir: "/app"
     environment:
       - "NODE_ENV=development"
@@ -46,7 +52,7 @@ services:
   psql:
     image: "postgres:10.2"
     environment:
-      POSTGRES_PASSWORD: "turnin_password"
+      POSTGRES_PASSWORD: "password"
     expose:
       - "5432"
 
