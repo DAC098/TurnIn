@@ -3,20 +3,23 @@ const isJsonContent = require('modules/middleware/isJsonContent');
 module.exports = [
 	[
 		{
-			path: '/',
-			methods: 'get'
+			path: '/:id',
+			methods: 'put'
 		},
+		isJsonContent(),
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
-			res.endJSON({'message':'ok'});
+			res.endJSONAsync({
+				'message': 'ok',
+				'params': req.params
+			});
 		}
 	],
 	[
 		{
-			path: '/',
-			methods: 'post'
+			path: "/:id",
+			methods: 'delete'
 		},
-		isJsonContent(),
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
 			res.endJSONAsync({

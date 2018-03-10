@@ -6,7 +6,7 @@ module.exports = [
 			path: '/login',
 			methods: 'post'
 		},
-		isJsonContent,
+		isJsonContent(),
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
 			res.endJSON({'message':'ok'});

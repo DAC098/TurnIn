@@ -20,7 +20,7 @@ module.exports = [
 			path: '/close',
 			methods: 'post'
 		},
-		isJsonContent,
+		isJsonContent(),
 		checkAuthorization,
 		async (req, res) => {
 			let body = await parseJson(req);

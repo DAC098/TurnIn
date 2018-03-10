@@ -37,6 +37,12 @@ const checkAuthorization = async (req,res) => {
 
 				break;
 		}
+	} else {
+		res.writeHead(401,{'content-type':'application/json'});
+		await res.endJSONAsync({
+			'message': 'no authorization header present'
+		});
+		return false;
 	}
 };
 

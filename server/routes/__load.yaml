@@ -4,5 +4,6 @@ order:
   - "login.js"
   - "students"
   - "images"
+  - "containers"
   - "assignments"
   - "close.js"
