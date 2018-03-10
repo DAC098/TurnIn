@@ -60,10 +60,30 @@ const default_setup = {
 	},
 	security: {
 		secret: 'secret'
+	},
+	docker: {
+		host_mount: '/var/lib/turnin/data'
+	},
+	directories: {
+		data_root: '/var/lib/turnin/data'
 	}
 };
 const valid_cli_names = cliValidNames(default_setup);
 const setup = new Setup(default_setup);
+
+const loadEtc = async () => {
+	if(await File.exists('/etc/turnin/config.yaml')) {
+		let data = await File.loadYaml('/etc/turnin/config.yaml');
+
+		let keys = traverseKeys(data);
+
+		for(let [k,v] of keys) {
+			setup.setKey(k,v);
+		}
+	}
+}
+
+setup['loadEtc'] = loadEtc;
 
 const processCliArgs = async () => {
 	let set_keys = new Set();
