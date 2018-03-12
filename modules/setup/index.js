@@ -81,7 +81,7 @@ const loadEtc = async () => {
 			setup.setKey(k,v);
 		}
 	}
-}
+};
 
 setup['loadEtc'] = loadEtc;
 

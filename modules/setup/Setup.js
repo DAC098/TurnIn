@@ -15,13 +15,13 @@ class Setup {
 
 		for(let i = 0, l = path.length; i < l - 1; ++i) {
 			if(!(path[i] in ref)) {
-				ref[path[i]] = {};
+				return false;
 			}
 
 			ref = ref[path[i]];
 		}
 
-		if(path.length > 1) {
+		if(path.length > 1 && path[path.length - 1] in ref) {
 			ref[path[path.length - 1]] = value;
 			return true;
 		} else {
@@ -55,7 +55,7 @@ class Setup {
 			ref = ref[path[i]];
 		}
 
-		if(ref[path[path.length - 1]] !== null && ref[path[path.length - 1]] !== undefined)
+		if(ref[path[path.length - 1]] !== null && ref[path[path.length - 1]] !== undefined && path[path.length - 1] in ref)
 			return _.cloneDeep(ref[path[path.length - 1]]);
 		else
 			return undefined;
