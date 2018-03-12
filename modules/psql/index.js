@@ -8,6 +8,10 @@ const db = new SQLPool({},{
 	connectionLimit: 20,
 	user: 'postgres',
 	password: 'password'
+},{
+	default_conn: {
+		database: 'turnin'
+	}
 });
 
 module.exports = db;

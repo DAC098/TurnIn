@@ -8,12 +8,21 @@ const default_interval_time = {
 	seconds: 0
 };
 
+const default_options = {
+	create_default: true,
+	default_conn: {}
+};
+
 class SQLPool {
-	constructor(interval_time,common_connection) {
+	constructor(interval_time, common_connection, options) {
 		this.connections = new Map();
 		this.interval = null;
 		this.interval_time = _.merge({},default_interval_time,interval_time);
 		this.common_connection = _.clone(common_connection);
+		this.options = _.merge({},default_options,options);
+
+		if(this.options.create_default)
+			this.createPool('default',this.options.default_conn);
 	}
 
 	createInterval() {
@@ -59,7 +68,6 @@ class SQLPool {
 		}
 
 		let config = _.merge({},this.common_connection,options);
-		console.log('connection info',config);
 
 		let conn = {
 			c: new SQLWrapper(config),
@@ -78,7 +86,7 @@ class SQLPool {
 		return !!conn;
 	}
 
-	getPool(name) {
+	getPool(name = 'default') {
 		let conn = this.connections.get(name);
 
 		if(conn) {
