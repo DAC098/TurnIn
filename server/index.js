@@ -18,8 +18,13 @@ const configure = require('modules/setup/configure');
 	log.info('running configure');
 	await configure.run();
 
+	const db_init = require('modules/psql/startup');
+
 	log.info('starting server');
 	const server = require('./main');
+
+	log.info('running db startup');
+	await db_init.startup();
 
 	if(process.env.NODE_ENV === 'development') {
 		require('./dev');
