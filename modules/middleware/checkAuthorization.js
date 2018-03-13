@@ -1,5 +1,8 @@
 const setup = require('../setup');
 const log = require('../log');
+const security = require('../security');
+
+const validUser = require('../psql/helpers/validUser');
 
 const atob = (string) => {
 	if(Buffer.byteLength(string) !== string.length)
@@ -17,20 +20,29 @@ const checkAuthorization = async (req,res) => {
 				let username = parsed[0];
 				let password = parsed.slice(1).join(':');
 
-				if(username !== 'server') {
-					res.writeHead(401,{'content-type':'application/json'});
-					await res.endJSONAsync({
-						'message': 'only server is allowed user'
-					});
-					return false;
-				}
+				try {
+					let result = await validUser(username,password);
 
-				if(password !== setup.getKey('security.secret')) {
-					res.writeHead(401,{'content-type':'application/json'});
-					await res.endJSONAsync({
-						'message': 'invalid password given in authorization header'
-					});
-					return false;
+					if(!result.success) {
+						if(!result.username) {
+							res.writeHead(401,{'content-type':'application/json'});
+							await res.endJSONAsync({
+								'message': 'invalid username'
+							});
+							return false;
+						}
+
+						if(!result.password) {
+							res.writeHead(401,{'content-type':'application/json'});
+							await res.endJSONAsync({
+								'message': 'invalid password'
+							});
+							return false;
+						}
+					}
+				} catch(err) {
+					log.error(err.stack);
+					await res.endError(err);
 				}
 				break;
 			case "Digest":
