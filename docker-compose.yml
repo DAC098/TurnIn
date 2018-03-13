@@ -50,10 +50,12 @@ services:
       - "6379"
     restart: unless-stopped
   psql:
-    image: "postgres:10.2"
+    build: ./psql/
     environment:
       POSTGRES_PASSWORD: "password"
     expose:
       - "5432"
+    ports:
+      - "5432:5432"
 
 ...

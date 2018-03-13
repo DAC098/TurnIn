@@ -55,8 +55,8 @@ const default_setup = {
 	psql: {
 		hostname: '127.0.0.1',
 		port: 5432,
-		username: 'postgres',
-		password: 'password'
+		username: 'turnin',
+		password: 'turnin_password'
 	},
 	security: {
 		secret: 'secret'
