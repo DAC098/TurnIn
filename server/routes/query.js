@@ -13,6 +13,7 @@ module.exports = [
 		},
 		checkAuthorization,
 		async (req,res) => {
+			let con = null;
 			try {
 				let body = await parseJson(req);
 
@@ -33,7 +34,7 @@ module.exports = [
 				}
 
 				let pool = db.getPool();
-				let con = await pool.connect();
+				con = await pool.connect();
 
 				let result = await con.query(body.query);
 
@@ -42,11 +43,11 @@ module.exports = [
 					'results': result.rows
 				});
 			} catch(err) {
-				res.writeHead(500,{'content-type':'application/json'});
-				await res.endJSONAsync({
-					'error': err.stack
-				});
+				await res.endError(err);
 			}
+
+			if(con)
+				con.release();
 		}
 	]
 ];

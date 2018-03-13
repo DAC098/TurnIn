@@ -33,8 +33,7 @@ module.exports = [
 					if(res.headersSent) {
 						res.end();
 					} else {
-						res.writeHead(500,{'content-type':'application/json'});
-						res.endJSON({'message':'something went wrong when sending the file'});
+						await res.endError(err,'something went wrong when sending the file');
 					}
 				}
 			} else {

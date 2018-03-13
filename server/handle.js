@@ -1,8 +1,11 @@
 const {URL} = require('url');
+const process = require('process');
 
 const log = require('modules/log');
 
 const router = require('./router');
+
+const is_dev = process.env.NODE_ENV === 'development';
 
 const handle = async (req,res) => {
 	res['endJSON'] = function(obj,cb) {
@@ -15,6 +18,19 @@ const handle = async (req,res) => {
 				resolve();
 			});
 		});
+	};
+
+	res['endError'] = async function(err,msg) {
+		let send = {
+			'message': msg || 'server error'
+		};
+
+		if(is_dev) {
+			send['stack'] = err.stack;
+		}
+
+		this.writeHead(500,{'content-type':'application/json'});
+		await this.endJSONAsync(send);
 	};
 
 	req.url_parsed = new URL(req.url,`https://${req.headers['host']}:443/`);
@@ -39,10 +55,7 @@ const handle = async (req,res) => {
 		}
 	} catch(err) {
 		log.error(err.stack);
-		res.writeHead(500,{'content-type':'application/json'});
-		res.endJSON({
-			'message': 'server error'
-		});
+		await res.endError(err);
 	}
 };
 
