@@ -1,0 +1,46 @@
+{
+  "users": [
+    {
+      "username": "test_user",
+      "password": "test_user",
+      "email": "test_user@example.com",
+      "fname": "test2",
+      "lname": "bot",
+      "permissions": {}
+    },
+    {
+      "username": "test_admin",
+      "password": "test_admin",
+      "email": "test_admin@example.com",
+      "type": "admin",
+      "fname": "test",
+      "lname": "lname"
+    },
+    {
+      "username": "student_one",
+      "password": "student_one",
+      "fname": "student",
+      "lname": "bot_one",
+      "is_student": true
+    },
+    {
+      "username": "student_two",
+      "password": "student_two",
+      "is_student": true
+    },
+    {
+      "username": "teacher_one",
+      "password": "teacher_one",
+      "email": "teacher_one@example.com",
+      "is_teacher": true
+    },
+    {
+      "username": "teacher_two",
+      "password": "teacher_two",
+      "email": "teacher_two@example.com",
+      "is_teacher": true,
+      "fname": "teacher",
+      "lname": "bot_two"
+    }
+  ]
+}
