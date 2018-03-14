@@ -26,7 +26,7 @@ const checkAuthorization = async (req,res) => {
 					if(!result.success) {
 						if(!result.username) {
 							res.writeHead(401,{'content-type':'application/json'});
-							await res.endJSONAsync({
+							await res.endJSON({
 								'message': 'invalid username'
 							});
 							return false;
@@ -34,24 +34,29 @@ const checkAuthorization = async (req,res) => {
 
 						if(!result.password) {
 							res.writeHead(401,{'content-type':'application/json'});
-							await res.endJSONAsync({
+							await res.endJSON({
 								'message': 'invalid password'
 							});
 							return false;
 						}
 					}
+
+					req.user = result.user;
 				} catch(err) {
 					log.error(err.stack);
 					await res.endError(err);
 				}
 				break;
 			case "Digest":
-
-				break;
+			default:
+				res.writeHead(403,{'content-type':'application/json'});
+				await res.endJSON({
+					'message': 'Authorization type not implemented: ' + split[0]
+				});
 		}
 	} else {
 		res.writeHead(401,{'content-type':'application/json'});
-		await res.endJSONAsync({
+		await res.endJSON({
 			'message': 'no authorization header present'
 		});
 		return false;
