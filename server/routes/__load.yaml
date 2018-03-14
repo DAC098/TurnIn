@@ -2,6 +2,7 @@ order:
   - "html.js"
   - "assets.js"
   - "login.js"
+  - "users"
   - "students"
   - "images"
   - "containers"
