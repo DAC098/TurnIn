@@ -33,20 +33,20 @@ module.exports = [
 					if ((Array.isArray(body.file_update) && checkCacheWithList(body.file_update)) ||
 						(typeof body.file_update === 'string' && body.file_update in require.cache)
 					) {
-						await res.endJSONAsync({
+						await res.endJSON({
 							'message': prevent_close ? 'holding on close' : 'closing server'
 						});
 
 						if (!prevent_close)
 							process.exit(0);
 					} else {
-						await res.endJSONAsync({
+						await res.endJSON({
 							'message': 'non server file, not closing server'
 						});
 					}
 				} else {
 					res.writeHead(200, {'content-type': 'application/json'});
-					await res.endJSONAsync({
+					await res.endJSON({
 						'message': prevent_close ? 'holding on close' : 'closing server'
 					});
 
@@ -55,7 +55,7 @@ module.exports = [
 				}
 			} else {
 				res.writeHead(200, {'content-type': 'application/json'});
-				await res.endJSONAsync({
+				await res.endJSON({
 					'message': prevent_close ? 'holding on close' : 'closing server'
 				});
 

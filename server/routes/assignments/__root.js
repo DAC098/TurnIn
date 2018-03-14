@@ -6,7 +6,7 @@ module.exports = [
 		},
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
-			res.endJSON({'message':'ok'});
+			await res.endJSON({'message':'ok'});
 		}
 	]
 ];

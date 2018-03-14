@@ -9,7 +9,7 @@ module.exports = [
 		isJsonContent(),
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
-			res.endJSONAsync({
+			await res.endJSON({
 				'message': 'ok',
 				'params': req.params
 			});
@@ -22,7 +22,7 @@ module.exports = [
 		},
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'application/json'});
-			res.endJSONAsync({
+			await res.endJSON({
 				'message': 'ok'
 			});
 		}

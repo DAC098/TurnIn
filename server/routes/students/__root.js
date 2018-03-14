@@ -32,7 +32,7 @@ module.exports = [
 				let rtn = util.createObject(result.rows);
 
 				res.writeHead(200,{'content-type':'application/json'});
-				await res.endJSONAsync({
+				await res.endJSON({
 					'result': rtn
 				});
 			} catch(err) {

@@ -19,7 +19,7 @@ module.exports = [
 
 				if(!('query' in body)) {
 					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSONAsync({
+					await res.endJSON({
 						'message': 'no query present in body'
 					});
 					return;
@@ -27,7 +27,7 @@ module.exports = [
 
 				if(typeof body['query'] !== 'string') {
 					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSONAsync({
+					await res.endJSON({
 						'message': 'query is not string'
 					});
 					return;
@@ -39,7 +39,7 @@ module.exports = [
 				let result = await con.query(body.query);
 
 				res.writeHead(200,{'content-type':'application/json'});
-				await res.endJSONAsync({
+				await res.endJSON({
 					'results': result.rows
 				});
 			} catch(err) {
