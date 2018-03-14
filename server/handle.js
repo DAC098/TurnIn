@@ -8,11 +8,11 @@ const router = require('./router');
 const is_dev = process.env.NODE_ENV === 'development';
 
 const handle = async (req,res) => {
-	res['endJSON'] = function(obj,cb) {
+	res['endJSONSync'] = function(obj,cb) {
 		this.end(JSON.stringify(obj),cb);
 	};
 
-	res['endJSONAsync'] = function(obj) {
+	res['endJSON'] = function(obj) {
 		return new Promise((resolve) => {
 			this.end(JSON.stringify(obj),() => {
 				resolve();
@@ -30,7 +30,7 @@ const handle = async (req,res) => {
 		}
 
 		this.writeHead(500,{'content-type':'application/json'});
-		await this.endJSONAsync(send);
+		await this.endJSON(send);
 	};
 
 	req.url_parsed = new URL(req.url,`https://${req.headers['host']}:443/`);
@@ -43,13 +43,13 @@ const handle = async (req,res) => {
 		if(!result.found_path) {
 			log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}: not found`);
 			res.writeHead(404,{'content-type':'application/json'});
-			res.endJSON({
+			await res.endJSON({
 				'message': 'not found'
 			});
 		} else if(result.found_path && !result.valid_method) {
 			log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}: invalid method`);
 			res.writeHead(405,{'content-type':'application/json'});
-			res.endJSON({
+			await res.endJSON({
 				'message': 'unhandled method'
 			});
 		}
