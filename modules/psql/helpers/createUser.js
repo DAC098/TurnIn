@@ -3,14 +3,7 @@ const _ = require('lodash');
 const db = require('../index');
 const security = require('../../security');
 
-const default_permissions = {
-	'create_images': true
-};
-const user_type_map = {
-	'master': 0,
-	'admin': 1,
-	'user': 2
-};
+const variables = require('../../variables');
 
 const createUser = async (user,body) => {
 	let con = null;
@@ -76,7 +69,7 @@ const createUser = async (user,body) => {
 		}
 
 		if(body.type) {
-			if(!(body.type in user_type_map)) {
+			if(!(body.type in variables.user_type_map)) {
 				return {
 					success: false,
 					reason: 'invalid user type given: ' + body.type,
@@ -84,7 +77,7 @@ const createUser = async (user,body) => {
 				};
 			}
 
-			if(user_type_map[body.type] < user_type_map[user.type]) {
+			if(variables.user_type_map[body.type] < variables.user_type_map[user.type]) {
 				return {
 					success: false,
 					reason: 'you cannot create a user that is higher than you',
@@ -119,10 +112,10 @@ const createUser = async (user,body) => {
 
 		if(body.permissions) {
 			insert_fields.push('permissions');
-			insert_values.push(`'${JSON.stringify(_.merge({},default_permissions,body.permissions))}'`);
+			insert_values.push(`'${JSON.stringify(_.merge({},variables.default_permissions,body.permissions))}'`);
 		} else {
 			insert_fields.push('permissions');
-			insert_values.push(`'${JSON.stringify(default_permissions)}'`);
+			insert_values.push(`'${JSON.stringify(variables.default_permissions)}'`);
 		}
 
 		let query = `
