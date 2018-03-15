@@ -20,6 +20,21 @@ const configure = require('modules/setup/configure');
 
 	const db_init = require('modules/psql/startup');
 
+	try {
+		log.info('checking database connection');
+
+		let connected = await db_init.awaitConnection(3,1000 * 3);
+
+		if(!connected) {
+			log.warn('unable to connected to database');
+			return;
+		} else {
+			log.info('connected to database');
+		}
+	} catch(err) {
+		log.error(err.stack);
+	}
+
 	log.info('starting server');
 	const server = require('./main');
 
