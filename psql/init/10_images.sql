@@ -1,7 +1,7 @@
 \connect turnin
 
 CREATE TYPE image_types AS ENUM ('custom','hub');
-CREATE TYPE image_statuses AS ENUM ('created','running','error');
+CREATE TYPE image_statuses AS ENUM ('created','running','removed','error');
 
 CREATE TABLE images (
 id           SERIAL PRIMARY KEY,

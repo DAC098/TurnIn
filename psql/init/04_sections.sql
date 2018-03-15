@@ -9,6 +9,6 @@ num        INT NOT NULL,
 year       INT NOT NULL,
 semester   semesters NOT NULL,
 teacher_id INT NOT NULL,
-FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+FOREIGN KEY (teacher_id) REFERENCES users(id),
 CONSTRAINT unique_sections UNIQUE (title,num,year,semester)
 );
