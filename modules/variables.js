@@ -6,6 +6,10 @@ const default_permissions = {
 		'create_custom': false,
 		'modify_custom': false,
 		'delete_custom': false
+	},
+	'networking': {
+		'exposing': false,
+		'mapping': false,
 	}
 };
 
@@ -26,4 +30,6 @@ const user_default_permissions = {
 	'user': {
 
 	}
-}
+};
+
+exports.user_default_permissions = user_default_permissions;
