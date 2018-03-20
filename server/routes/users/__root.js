@@ -1,9 +1,8 @@
 const db = require('modules/psql');
 const util = require('modules/psql/util');
+const createUser = require('modules/psql/helpers/createUser');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
-
-const createUser = require('modules/psql/helpers/createUser');
 
 const parseJson = require('modules/parser/json');
 
