@@ -7,5 +7,6 @@ order:
   - "images"
   - "containers"
   - "assignments"
+  - "sections"
   - "close.js"
   - "query.js"

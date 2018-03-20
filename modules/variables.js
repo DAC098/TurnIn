@@ -2,6 +2,11 @@ const default_permissions = {
 	'create_image': false,
 	'modify_image': false,
 	'delete_image': false,
+	'containers': {
+		'create_custom': false,
+		'modify_custom': false,
+		'delete_custom': false
+	}
 };
 
 exports.default_permissions = default_permissions;
@@ -13,3 +18,12 @@ const user_type_map = {
 };
 
 exports.user_type_map = user_type_map;
+
+const user_default_permissions = {
+	'admin': {
+
+	},
+	'user': {
+
+	}
+}

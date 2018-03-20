@@ -1,8 +1,8 @@
-const setup = require('../setup');
-const log = require('../log');
-const security = require('../security');
+const setup = require('../../setup/index');
+const log = require('../../log/index');
+const security = require('../index');
 
-const validUser = require('../psql/helpers/validUser');
+const validUser = require('../../psql/helpers/validUser');
 
 const atob = (string) => {
 	if(Buffer.byteLength(string) !== string.length)
@@ -25,16 +25,14 @@ const checkAuthorization = async (req,res) => {
 
 					if(!result.success) {
 						if(!result.username) {
-							res.writeHead(401,{'content-type':'application/json'});
-							await res.endJSON({
+							await res.endJSON(401,{
 								'message': 'invalid username'
 							});
 							return false;
 						}
 
 						if(!result.password) {
-							res.writeHead(401,{'content-type':'application/json'});
-							await res.endJSON({
+							await res.endJSON(401,{
 								'message': 'invalid password'
 							});
 							return false;
@@ -49,14 +47,12 @@ const checkAuthorization = async (req,res) => {
 				break;
 			case "Digest":
 			default:
-				res.writeHead(403,{'content-type':'application/json'});
-				await res.endJSON({
+				await res.endJSON(403,{
 					'message': 'Authorization type not implemented: ' + split[0]
 				});
 		}
 	} else {
-		res.writeHead(401,{'content-type':'application/json'});
-		await res.endJSON({
+		await res.endJSON(401,{
 			'message': 'no authorization header present'
 		});
 		return false;

@@ -1,4 +1,5 @@
 const db = require('modules/psql');
+const util = require('modules/psql/util');
 
 module.exports = [
 	[
@@ -29,15 +30,15 @@ module.exports = [
 					lname`;
 
 				let result = await con.query(query);
+				let rows = util.createObject(result.rows);
 
-				if(result.rows.length === 1) {
-					res.writeHead(200,{'content-type':'application/json'});
+				if(rows.length === 1) {
 					await res.endJSON({
-						'result': result.rows[0]
+						'length': 1,
+						'result': rows[0]
 					});
 				} else {
-					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSON({
+					await res.endJSON(400,{
 						'message': 'unable to delete user'
 					});
 				}

@@ -1,11 +1,7 @@
-const _ = require('lodash');
-
 const db = require('modules/psql');
-const util = require('modules/psql/util');
-const createUser = require('modules/psql/helpers/createUser');
 
-const parser = require('modules/parser');
 const isJsonContent = require('modules/middleware/isJsonContent');
+const parser = require('modules/parser');
 
 module.exports = [
 	[
@@ -21,24 +17,15 @@ module.exports = [
 				con = await pool.connect();
 
 				let query = `
-				select
-					id as id,
-					fname as name__first,
-					lname as name__last,
-					email,
-					username
-				from users
-				where
-					is_student is true
+				select *
+				from sections
 				`;
 
 				let result = await con.query(query);
 
-				let rtn = util.createObject(result.rows);
-
 				await res.endJSON({
-					'length': rtn.length,
-					'result': rtn
+					'length': result.rows.length,
+					'result': result.rows
 				});
 			} catch(err) {
 				await res.endError(err);
@@ -62,19 +49,26 @@ module.exports = [
 				con = await pool.connect();
 
 				let body = await parser.json(req);
+				let insert_values = [
+					`'${body.title}'`,
+					body.num,
+					body.year,
+					`'${body.semester}'`,
+					body.teacher_id
+				];
 
-				let {success,returned,user} = await createUser(req.user,_.merge({},body,{type:'user',is_student:true,is_teacher:false}));
+				let insert_query = `
+				insert into sections (title,num,year,semester,teacher_id) values
+				(${insert_values.join(',')})
+				returning *
+				`;
 
-				if(success) {
-					await res.endJSON({
-						'length': 1,
-						'result': [user]
-					});
-				} else {
-					await res.endJSON(400,{
-						'message': 'unable to create student'
-					});
-				}
+				let result = await con.query(insert_query);
+
+				await res.endJSON({
+					'length': result.rows.length,
+					'result': result.rows
+				});
 			} catch(err) {
 				await res.endError(err);
 			}

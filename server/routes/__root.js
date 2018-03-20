@@ -1,4 +1,4 @@
-const parseText = require('../parser/text');
+const parseText = require('modules/parser/text');
 
 module.exports = [
 	[
@@ -18,7 +18,6 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
-			res.writeHead(200,{'content-type':'application/json'});
 			await res.endJSON({
 				'message':'ok',
 				'page':'root',

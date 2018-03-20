@@ -1,10 +1,11 @@
 const db = require('modules/psql');
+const util = require('modules/psql/util');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 
 const createUser = require('modules/psql/helpers/createUser');
 
-const parseJson = require('../../parser/json');
+const parseJson = require('modules/parser/json');
 
 module.exports = [
 	[
@@ -28,8 +29,8 @@ module.exports = [
 						type,
 						is_student,
 						is_teacher,
-						fname,
-						lname
+						fname as name__first,
+						lname as name__last
 					from users
 					where
 						type > '${req.user.type}'
@@ -39,8 +40,11 @@ module.exports = [
 
 				let result = await con.query(query);
 
-				res.writeHead(200,{'content-type':'application/json'});
-				await res.endJSON({'result':result.rows});
+				let rows = util.createObject(result.rows);
+				await res.endJSON({
+					'length': rows.length,
+					'result': rows
+				});
 			} catch(err) {
 				await res.endError(err);
 			}
@@ -61,14 +65,13 @@ module.exports = [
 				let result = await createUser(req.user,body);
 
 				if(!result.success) {
-					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSON({
+					await res.endJSON(400,{
 						'message': result.reason
 					});
 				} else {
-					res.writeHead(200,{'content-type':'application/json'});
 					await res.endJSON({
-						'result': result.user
+						'length': 1,
+						'result': [result.user]
 					});
 				}
 			} catch(err) {

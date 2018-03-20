@@ -6,6 +6,7 @@ const _ = require('lodash');
 
 const Dir = require('modules/fs/Dir');
 const File = require('modules/fs/File');
+const log = require('modules/log');
 
 // global.on('endpoint', (...args) => {
 //   console.log('endpoint:',...args);

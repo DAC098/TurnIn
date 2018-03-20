@@ -1,8 +1,9 @@
 const process = require('process');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
-const checkAuthorization = require('modules/middleware/checkAuthorization');
-const parseJson = require('../parser/json');
+const checkAuthorization = require('modules/security/middleware/checkAuthorization');
+const checkUserType = require('modules/security/middleware/checkUserType');
+const parseJson = require('modules/parser/json');
 
 const checkCacheWithList = list => {
 	for (let file of list) {
@@ -22,6 +23,7 @@ module.exports = [
 		},
 		isJsonContent(),
 		checkAuthorization,
+		checkUserType('master'),
 		async (req, res) => {
 			let body = await parseJson(req);
 			let prevent_close = req.url_parsed.searchParams.has('no_close');
@@ -45,7 +47,6 @@ module.exports = [
 						});
 					}
 				} else {
-					res.writeHead(200, {'content-type': 'application/json'});
 					await res.endJSON({
 						'message': prevent_close ? 'holding on close' : 'closing server'
 					});
@@ -54,7 +55,6 @@ module.exports = [
 						process.exit(0);
 				}
 			} else {
-				res.writeHead(200, {'content-type': 'application/json'});
 				await res.endJSON({
 					'message': prevent_close ? 'holding on close' : 'closing server'
 				});

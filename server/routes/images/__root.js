@@ -2,7 +2,7 @@ const db = require('modules/psql');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 
-const parseJson = require('../../parser/json');
+const parseJson = require('modules/parser/json');
 
 module.exports = [
 	[
@@ -11,7 +11,6 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
-			res.writeHead(200,{'content-type':'application/json'});
 			await res.endJSON({'message':'ok'});
 		}
 	],
@@ -29,7 +28,6 @@ module.exports = [
 					image_name,
 					
 				`;
-				res.writeHead(200,{'content-type':'application/json'});
 				await res.endJSON({
 					'message': 'ok'
 				});

@@ -8,7 +8,6 @@ module.exports = [
 		},
 		isJsonContent(),
 		async (req,res) => {
-			res.writeHead(200,{'content-type':'application/json'});
 			await res.endJSON({'message':'ok'});
 		}
 	]

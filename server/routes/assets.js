@@ -37,8 +37,7 @@ module.exports = [
 					}
 				}
 			} else {
-				res.writeHead(404,{'content-type':'application/json'});
-				await res.endJSON({
+				await res.endJSON(404,{
 					'message': 'file not found'
 				});
 			}

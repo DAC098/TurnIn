@@ -43,5 +43,8 @@ const configure = require('modules/setup/configure');
 
 	if(process.env.NODE_ENV === 'development') {
 		require('./dev');
+
+		log.info('loading test data for database');
+		await db_init.loadTestData();
 	}
 })();

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 
 const db = require('../index');
+const util = require('../util');
 const security = require('../../security');
 
 const variables = require('../../variables');
@@ -128,16 +129,17 @@ const createUser = async (user,body) => {
 					type,
 					is_student,
 					is_teacher,
-					fname,
-					lname`;
+					fname as name__first,
+					lname as name__last`;
 
 		let result = await con.query(query);
+		let rows = util.createObject(result.rows);
 
-		if(result.rows.length === 1) {
+		if(rows.length === 1) {
 			return {
 				success: true,
 				reason: '',
-				user: result.rows[0]
+				user: rows[0]
 			}
 		} else {
 			return {

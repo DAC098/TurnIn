@@ -1,9 +1,12 @@
 const log = require('modules/log');
 const db = require('modules/psql');
 
-const checkAuthorization = require('modules/middleware/checkAuthorization');
+const isJsonContent = require('modules/middleware/isJsonContent');
 
-const parseJson = require('../parser/json');
+const checkAuthorization = require('modules/security/middleware/checkAuthorization');
+const checkUserType = require('modules/security/middleware/checkUserType');
+
+const parseJson = require('modules/parser/json');
 
 module.exports = [
 	[
@@ -12,22 +15,22 @@ module.exports = [
 			methods: 'post'
 		},
 		checkAuthorization,
+		checkUserType('master'),
+		isJsonContent(),
 		async (req,res) => {
 			let con = null;
 			try {
 				let body = await parseJson(req);
 
 				if(!('query' in body)) {
-					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSON({
+					await res.endJSON(400,{
 						'message': 'no query present in body'
 					});
 					return;
 				}
 
 				if(typeof body['query'] !== 'string') {
-					res.writeHead(400,{'content-type':'application/json'});
-					await res.endJSON({
+					await res.endJSON(400,{
 						'message': 'query is not string'
 					});
 					return;
@@ -38,7 +41,6 @@ module.exports = [
 
 				let result = await con.query(body.query);
 
-				res.writeHead(200,{'content-type':'application/json'});
 				await res.endJSON({
 					'results': result.rows
 				});
