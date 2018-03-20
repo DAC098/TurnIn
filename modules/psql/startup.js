@@ -45,6 +45,53 @@ const awaitConnection = async (attempts = 3,interval = 1000 * 10) => {
 
 exports.awaitConnection = awaitConnection;
 
+const loadTestData = async () => {
+	let con = null;
+
+	try {
+		let pool = db.getPool();
+		con = await pool.connect();
+
+		let test_data = JSON.parse(await File.read(process.cwd() + '/psql/test_data.json'));
+
+		for(let test_user of test_data.users) {
+			try {
+				let result = await createUser({'type':'master'},test_user);
+			} catch(err) {
+
+			}
+		}
+
+		for(let test_section of test_data.sections) {
+			try {
+				let keys = Object.keys(test_section);
+				let values = [];
+
+				for(let k of keys) {
+					values.push(test_section[k]);
+				}
+
+				let insert = `
+					insert into sections (${keys.join(',')}) values
+					(${values.join(',')})
+					on conflict on constraint unique_sections do nothing
+					`;
+
+				let result = await con.query(insert);
+			} catch(err) {
+
+			}
+		}
+	} catch(err) {
+		log.error(err.stack);
+	}
+
+	if(con)
+		con.release();
+};
+
+exports.loadTestData = loadTestData;
+
 const startup = async () => {
 	let con = null;
 
@@ -69,18 +116,6 @@ const startup = async () => {
 				log.info('created master user');
 			} else {
 				log.warn('unable to create master user');
-			}
-		}
-
-		if(is_dev) {
-			let test_data = JSON.parse(await File.read(process.cwd() + '/psql/test_data.json'));
-
-			for(let test_user of test_data.users) {
-				try {
-					let result = await createUser({'type':'master'},test_user);
-				} catch(err) {
-
-				}
 			}
 		}
 	} catch(err) {
