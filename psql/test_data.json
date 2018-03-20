@@ -42,5 +42,35 @@
       "fname": "teacher",
       "lname": "bot_two"
     }
+  ],
+  "sections": [
+    {
+      "title": "'CSCI 311'",
+      "num": 8398,
+      "year": 2018,
+      "semester": "'fall'",
+      "teacher_id": "(select id from users where username = 'teacher_two')"
+    },
+    {
+      "title": "'CINS 465'",
+      "num": 5216,
+      "year": 2018,
+      "semester": "'spring'",
+      "teacher_id": "(select id from users where username = 'teacher_one')"
+    },
+    {
+      "title": "'CSCI 211'",
+      "num": 6354,
+      "year": 2017,
+      "semester": "'summer'",
+      "teacher_id": "(select id from users where username = 'teacher_two')"
+    },
+    {
+      "title": "'CSCI 111'",
+      "num": 3524,
+      "year": 2017,
+      "semester": "'winter'",
+      "teacher_id": "(select id from users where username = 'teacher_one')"
+    }
   ]
 }
