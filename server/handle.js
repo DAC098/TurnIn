@@ -1,6 +1,8 @@
 const {URL} = require('url');
 const process = require('process');
 
+const _ = require('lodash');
+
 const log = require('modules/log');
 
 const router = require('./router');
@@ -12,7 +14,30 @@ const handle = async (req,res) => {
 		this.end(JSON.stringify(obj),cb);
 	};
 
-	res['endJSON'] = function(obj) {
+	res['endJSON'] = function(...args) {
+		let obj = {};
+		let status = 200;
+		let headers = {'content-type':'application/json'};
+
+		if(args.length === 1) {
+			obj = args[0];
+		}
+
+		if(args.length === 2) {
+			status = args[0];
+			obj = args[1];
+		}
+
+		if(args.length === 3) {
+			status = args[0];
+			headers = _.merge({},headers,args[1]);
+			obj = args[2];
+		}
+
+		if(!this.headersSent) {
+			this.writeHead(status,headers);
+		}
+
 		return new Promise((resolve) => {
 			this.end(JSON.stringify(obj),() => {
 				resolve();
@@ -42,14 +67,12 @@ const handle = async (req,res) => {
 
 		if(!result.found_path) {
 			log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}: not found`);
-			res.writeHead(404,{'content-type':'application/json'});
-			await res.endJSON({
+			await res.endJSON(404,{
 				'message': 'not found'
 			});
 		} else if(result.found_path && !result.valid_method) {
 			log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}: invalid method`);
-			res.writeHead(405,{'content-type':'application/json'});
-			await res.endJSON({
+			await res.endJSON(405,{
 				'message': 'unhandled method'
 			});
 		}
