@@ -2,7 +2,7 @@ const db = require('modules/psql');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 
-const parseJson = require('modules/parser/json');
+const parser = require('modules/parser');
 
 module.exports = [
 	[
@@ -21,8 +21,12 @@ module.exports = [
 		},
 		isJsonContent(),
 		async (req,res) => {
+			let con = null;
+
 			try {
-				let body = await parseJson(req);
+				con = await db.connect();
+
+				let body = await parser.json(req);
 				let query = `
 				INSERT INTO images (
 					image_name,
@@ -32,7 +36,7 @@ module.exports = [
 					'message': 'ok'
 				});
 			} catch(err) {
-
+				await res.endError(err);
 			}
 		}
 	]
