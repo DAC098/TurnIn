@@ -15,10 +15,18 @@ class SQLWrapper {
 		this.closed = false;
 	}
 
+	/**
+	 *
+	 * @returns {Promise<SQLConnection>}
+	 */
 	async connect() {
 		return new SQLConnection(await this._c.connect())
 	}
 
+	/**
+	 *
+	 * @returns {Promise<void>}
+	 */
 	async end() {
 		await this._c.end();
 		this.closed = true;

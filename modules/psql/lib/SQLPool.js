@@ -52,6 +52,12 @@ class SQLPool {
 		return Promise.all(closing);
 	}
 
+	/**
+	 *
+	 * @param name    {string}
+	 * @param options {Object=}
+	 * @returns {SQLWrapper}
+	 */
 	createPool(name,options) {
 		if(this.connections.has(name)) {
 			let conn = this.connections.get(name);
@@ -80,12 +86,22 @@ class SQLPool {
 		return conn.c
 	}
 
+	/**
+	 *
+	 * @param name {string}
+	 * @returns {boolean}
+	 */
 	hasPool(name) {
 		let conn = this.connections.get(name);
 
 		return !!conn;
 	}
 
+	/**
+	 *
+	 * @param name {string}
+	 * @returns {SQLWrapper|null}
+	 */
 	getPool(name = 'default') {
 		let conn = this.connections.get(name);
 
@@ -98,6 +114,11 @@ class SQLPool {
 		}
 	}
 
+	/**
+	 *
+	 * @param name {string}
+	 * @returns {boolean}
+	 */
 	updatePool(name) {
 		let conn = this.connections.get(name);
 
@@ -107,6 +128,21 @@ class SQLPool {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 *
+	 * @param name {string}
+	 * @returns {Promise<SQLConnection>}
+	 */
+	async connect(name) {
+		let pool = this.getPool(name);
+
+		if(pool !== null) {
+			return await pool.connect();
+		} else {
+			return null;
 		}
 	}
 }
