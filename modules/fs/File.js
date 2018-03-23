@@ -14,14 +14,29 @@ class File {
 
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Promise<fs.Stats>}
+	 */
 	static async stats(path) {
 		return await nLStat(path);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {fs.Stats}
+	 */
 	static statsSync(path) {
 		return nFS.lstatSync(path);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Promise<boolean>}
+	 */
 	static async exists(path) {
 		try {
 			let stats = await File.stats(path);
@@ -32,6 +47,11 @@ class File {
 		}
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {boolean}
+	 */
 	static existsSync(path) {
 		try {
 			let stats = File.statsSync(path);
@@ -42,6 +62,12 @@ class File {
 		}
 	}
 
+	/**
+	 *
+	 * @param path    {string}
+	 * @param options {Object=}
+	 * @returns {Promise<string>}
+	 */
 	static async read(path,options) {
 			if(await File.exists(path))
 				return nReadFile(path,options);
@@ -49,6 +75,12 @@ class File {
 				return '';
 	}
 
+	/**
+	 *
+	 * @param path    {string}
+	 * @param options {Object=}
+	 * @returns {string}
+	 */
 	static readSync(path,options) {
 		if(File.existsSync(path))
 			return nFS.readFileSync(path,options);
@@ -56,15 +88,33 @@ class File {
 			return '';
 	}
 
+	/**
+	 *
+	 * @param path    {string}
+	 * @param data    {string}
+	 * @param options {Object=}
+	 * @returns {Promise<void>}
+	 */
 	static async write(path,data,options) {
 		let write = typeof data.then === 'function' ? await data : data;
 		await nWriteFile(path,write,options);
 	}
 
+	/**
+	 *
+	 * @param path    {string}
+	 * @param data    {string}
+	 * @param options {Object=}
+	 */
 	static writeSync(path,data,options) {
 		nFS.writeFileSync(path,data,options);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Promise<boolean>}
+	 */
 	static async remove(path) {
 			if(await File.exists(path))
 				await nUnlinkFile(path);
@@ -72,6 +122,11 @@ class File {
 			return true;
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {boolean}
+	 */
 	static removeSync(path) {
 		if(File.existsSync(path))
 			nFS.unlinkSync(path);
@@ -79,11 +134,21 @@ class File {
 		return true;
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Promise<Object>}
+	 */
 	static async loadYaml(path) {
 		let data = await File.read(path);
 		return jsYaml.safeLoad(data);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Object}
+	 */
 	static loadYamlSync(path) {
 		let data = File.readSync(path);
 		return jsYaml.safeLoad(data);

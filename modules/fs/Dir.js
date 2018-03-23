@@ -14,15 +14,33 @@ const nRmDir = nUtil.promisify(nFS.rmdir);
 const common = require('./common');
 const File = require('./File');
 
+/**
+ *
+ * @typedef {{
+ *  ignore: Array<string>,
+  * depth: number,
+  * with_stats: boolean,
+  * include_file: boolean,
+  * include_dir: boolean,
+  * single_list: boolean,
+  * base: string
+  * }}
+ */
 const read_default = {
 	ignore: [],
 	depth: 0,
 	with_stats: false,
 	include_file: true,
 	include_dir: true,
-	single_list: false
+	single_list: false,
+	base: ''
 };
 
+/**
+ *
+ * @param stats {fs.Stats}
+ * @returns {string}
+ */
 function getStatType(stats) {
 	if(stats.isDirectory())
 		return 'dir';
@@ -34,6 +52,19 @@ function getStatType(stats) {
 		return 'unknown';
 }
 
+/**
+ *
+ * @param path  {string}
+ * @param opt   {read_default}
+ * @param stats {fs.Stats}
+ * @returns {{
+ *   base: string,
+ *   item: string,
+ *   name: string,
+ *   stats: fs.Stats,
+ *   type: string
+ * }}
+ */
 function getReadStats(path,opt,stats) {
 	return {
 		base: String(opt.base),
@@ -44,7 +75,19 @@ function getReadStats(path,opt,stats) {
 	};
 }
 
+/**
+ *
+ * @param path
+ * @param opt {read_default}
+ * @returns {Promise<found>}
+ */
 async function rRead(path,opt) {
+	/**
+	 * @typedef {Array<string|getReadStats>|{
+	 *   files: Array<string|getReadStats>,
+	 *   directories: Array<string|getReadStats>
+	 * }}
+	 */
 	let found = opt.single_list ? [] : {
 		files: [],
 		directories: []
@@ -99,7 +142,19 @@ async function rRead(path,opt) {
 	return found;
 }
 
+/**
+ *
+ * @param path {string}
+ * @param opt  {read_default}
+ * @returns {found}
+ */
 function rReadSync(path,opt) {
+	/**
+	 * @typedef {Array<string|getReadStats>|{
+	 *   files: Array<string|getReadStats>,
+	 *   directories:Array<string|getReadStats
+	 * }}
+	 */
 	let found = opt.single_list ? [] : {
 		files: [],
 		directories: []
@@ -160,6 +215,11 @@ class Dir {
 
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {Promise<boolean>}
+	 */
 	static async exists(path) {
 		try {
 			let stats = await nLStat(path);
@@ -170,6 +230,11 @@ class Dir {
 		}
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @returns {boolean}
+	 */
 	static existsSyc(path) {
 		try {
 			let stats = nFS.lstatSync(path);
@@ -180,21 +245,36 @@ class Dir {
 		}
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @param opt  {read_default=}
+	 * @returns {Promise<found>}
+	 */
 	static async read(path,opt = {}) {
 		opt = merge({},read_default,opt);
-
-		opt.base = path;
 
 		return await rRead(path,opt);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @param opt  {read_default=}
+	 * @returns {found}
+	 */
 	static readSync(path,opt = {}) {
-		let found = [];
 		opt = merge({},read_default,opt);
 
 		return rReadSync(path,opt);
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @param mode {string=}
+	 * @returns {Promise<void>}
+	 */
 	static async make(path,mode) {
 		let parse = nPath.parse(path);
 		let check = parse.root;
@@ -209,6 +289,11 @@ class Dir {
 		}
 	}
 
+	/**
+	 *
+	 * @param path {string}
+	 * @param mode {string=}
+	 */
 	static makeSync(path,mode) {
 		let parse = nPath.parse(path);
 		let check = parse.root;
@@ -223,6 +308,12 @@ class Dir {
 		}
 	}
 
+	/**
+	 *
+	 * @param path     {string}
+	 * @param rm_files {boolean=}
+	 * @returns {Promise<boolean>}
+	 */
 	static async remove(path,rm_files = false) {
 		let contents = await Dir.read(path,{depth:-1});
 

@@ -1,5 +1,11 @@
 const minimatch = require('minimatch');
 
+/**
+ *
+ * @param inspect {string}
+ * @param check   {Array<string|RegExp>|string|RegExp}
+ * @returns {boolean}
+ */
 function runCheck(inspect,check) {
 	if(Array.isArray(check)) {
 		for(let item of check) {
