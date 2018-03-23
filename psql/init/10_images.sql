@@ -12,7 +12,7 @@ options      JSON,
 image_type   image_types NOT NULL,
 image_status image_statuses,
 image_exists BOOLEAN,
-dockerfile   VARCHAR,
+dockerfile   BOOLEAN,
 image_url    VARCHAR,
 FOREIGN KEY (image_owner) REFERENCES users(id)
 );
