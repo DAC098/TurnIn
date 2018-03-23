@@ -4,11 +4,24 @@ const _ = require('lodash');
 
 const data_sym = Symbol('data');
 
+/**
+ * @struct
+ */
 class Setup {
+	/**
+	 * @constructor
+	 * @param default_data
+	 */
 	constructor(default_data) {
 		this[data_sym] = _.cloneDeep(default_data);
 	}
 
+	/**
+	 *
+	 * @param key_str {string}
+	 * @param value   {*}
+	 * @returns {boolean}
+	 */
 	setKey(key_str,value) {
 		let path = typeof key_str === 'string' ? key_str.split('.') : [];
 		let ref = this[data_sym];
@@ -29,6 +42,11 @@ class Setup {
 		}
 	}
 
+	/**
+	 *
+	 * @param key_str {string}
+	 * @param obj     {Object}
+	 */
 	setObj(key_str,obj) {
 		let path = typeof key_str === 'string' ? key_str.split('.') : [];
 		let ref = this[data_sym];
@@ -43,6 +61,11 @@ class Setup {
 		ref = _.merge({},ref,obj);
 	}
 
+	/**
+	 *
+	 * @param key_str {string}
+	 * @returns {*}
+	 */
 	getKey(key_str) {
 		let path = key_str.split('.');
 		let ref = this[data_sym];
@@ -61,6 +84,10 @@ class Setup {
 			return undefined;
 	}
 
+	/**
+	 *
+	 * @returns {Object}
+	 */
 	get() {
 		return _.cloneDeep(this[data_sym]);
 	}
