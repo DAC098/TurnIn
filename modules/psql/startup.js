@@ -56,9 +56,9 @@ const loadTestData = async () => {
 
 		for(let test_user of test_data.users) {
 			try {
-				let result = await createUser({'type':'master'},test_user);
+				let result = await createUser({'type':'master'},test_user,con);
 			} catch(err) {
-
+				log.error(err.stack);
 			}
 		}
 
@@ -79,7 +79,7 @@ const loadTestData = async () => {
 
 				let result = await con.query(insert);
 			} catch(err) {
-
+				log.error(err.stack);
 			}
 		}
 	} catch(err) {
