@@ -30,6 +30,8 @@ const log = require('modules/log');
 
 const router = new Router({name: '/'});
 
+module.exports = router;
+
 let dir_list = Dir.readSync(path.join(__dirname,'./routes'), {
 	base: path.join(__dirname,'./routes'),
 	with_stats: true,
@@ -146,5 +148,3 @@ const loadDirectory = (router_instance,list) => {
 };
 
 loadDirectory(router, dir_list);
-
-module.exports = router;
