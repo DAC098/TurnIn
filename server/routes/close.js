@@ -5,6 +5,8 @@ const checkAuthorization = require('modules/security/middleware/checkAuthorizati
 const checkUserType = require('modules/security/middleware/checkUserType');
 const parseJson = require('modules/parser/json');
 
+const server = require('../main');
+
 const checkCacheWithList = list => {
 	for (let file of list) {
 		if (file in require.cache) {
@@ -22,7 +24,6 @@ module.exports = [
 			methods: 'post'
 		},
 		isJsonContent(),
-		checkAuthorization,
 		checkUserType('master'),
 		async (req, res) => {
 			let body = await parseJson(req);
@@ -40,7 +41,7 @@ module.exports = [
 						});
 
 						if (!prevent_close)
-							process.exit(0);
+							await server.closeAndExit();
 					} else {
 						await res.endJSON({
 							'message': 'non server file, not closing server'
@@ -52,7 +53,7 @@ module.exports = [
 					});
 
 					if (!prevent_close)
-						process.exit(0);
+						await server.closeAndExit();
 				}
 			} else {
 				await res.endJSON({
@@ -60,7 +61,7 @@ module.exports = [
 				});
 
 				if (!prevent_close)
-					process.exit(0);
+					await server.closeAndExit();
 			}
 		}
 	]
