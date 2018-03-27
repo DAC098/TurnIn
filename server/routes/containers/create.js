@@ -15,22 +15,20 @@ module.exports = [
 			try {
 				let body = await parser.json(req);
 				let config = _.merge({},body,{
-					'Labels': {
+					'labels': {
 						'com.turnin': 'true',
 						'com.turnin.user': req.user.id.toString()
 					}
 				});
-				let {success,returned,headers} = await container.create(null,config);
+				let {success,returned} = await container.create(null,config);
 
 				if(success) {
 					await res.endJSON({
-						returned,
-						headers
+						returned
 					});
 				} else {
 					await res.endJSON({
-						returned,
-						headers
+						returned
 					});
 				}
 			} catch(err) {
