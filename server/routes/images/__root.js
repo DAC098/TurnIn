@@ -1,6 +1,7 @@
 const _ = require('lodash');
 
 const db = require('modules/psql');
+const listImages = require('modules/psql/helpers/images/listImages');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 const variables = require('modules/variables');
@@ -14,49 +15,24 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
-			let con = null;
-
 			try {
-				con = await db.connect();
-				let where = [];
+				let options  = {};
 
-				let query = `
-				select
-					images.*,
-					users.username as username
-				from images
-				join users on
-					images.image_owner = users.id
-				`;
-
-				if(req.user.type === 'master' || req.user.permission.modify_image) {
-					where.push(`users.type <= '${req.user.type}'`);
+				if(req.user.type === 'master' || req.user.permission.image.modify) {
+					options.below_user = req.user.type;
 				} else {
-					where.push(`image_owner = ${req.user.id}`);
+					options.owner_id = req.user.id;
 				}
 
-				if(where.length !== 0) {
-					query += `where
-					${where.join(' and ')}
-				`;
-				}
-
-				query += `order by
-					images.image_name
-				`;
-
-				let result = await con.query(query);
+				let result = await listImages(options);
 
 				await res.endJSON({
-					'length': result.rows.length,
-					'result': result.rows
+					'length': result.length,
+					'result': result
 				});
 			} catch(err) {
 				await res.endError(err);
 			}
-
-			if(con)
-				con.release();
 		}
 	],
 	[

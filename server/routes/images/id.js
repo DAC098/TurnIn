@@ -1,9 +1,11 @@
 const isJsonContent = require('modules/middleware/isJsonContent');
 
+const id_path ='/:id([0-9]+)';
+
 module.exports = [
 	[
 		{
-			path: '/:id',
+			path: id_path,
 			methods: 'put'
 		},
 		isJsonContent(),
@@ -16,7 +18,7 @@ module.exports = [
 	],
 	[
 		{
-			path: "/:id",
+			path: id_path,
 			methods: 'delete'
 		},
 		async (req,res) => {
@@ -24,5 +26,5 @@ module.exports = [
 				'message': 'ok'
 			});
 		}
-	]
+	],
 ];
