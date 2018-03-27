@@ -4,6 +4,12 @@ const log = require('modules/log');
 const setup = require('modules/setup');
 const configure = require('modules/setup/configure');
 
+const loadRoutes = require('./load_routes');
+
+process.on('exit',code => {
+	log.warn('process exiting',{code});
+});
+
 (async () => {
 	log.setName('server');
 
@@ -36,7 +42,10 @@ const configure = require('modules/setup/configure');
 	}
 
 	log.info('starting server');
-	const server = require('./main');
+	require('./main');
+
+	log.info('loading routes');
+	loadRoutes();
 
 	log.info('running db startup');
 	await db_init.startup();
