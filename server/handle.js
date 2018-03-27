@@ -10,6 +10,14 @@ const router = require('./router');
 const is_dev = process.env.NODE_ENV === 'development';
 
 const handle = async (req,res) => {
+	res['endAsync'] = function(data) {
+		return new Promise((resolve,reject) => {
+			this.end(data,() => {
+				resolve();
+			});
+		});
+	};
+
 	res['endJSONSync'] = function(obj,cb) {
 		this.end(JSON.stringify(obj),cb);
 	};
