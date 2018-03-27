@@ -5,6 +5,8 @@ const chokidar = require('chokidar');
 
 const log = require('modules/log');
 
+const server = require('./main');
+
 let timer = null;
 let watch_dir = path.resolve(__dirname,'../');
 let change_list = [];
@@ -44,12 +46,12 @@ watcher.on('change', p => {
 	if(timer)
 		clearTimeout(timer);
 
-	timer = setTimeout(() => {
+	timer = setTimeout(async () => {
 		clearTimeout(timer);
 
 		if(shouldRestart(change_list)) {
 			log.info('file update, closing server');
-			process.exit(0);
+			await server.closeAndExit();
 		}
 
 		change_list = [];
