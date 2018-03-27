@@ -1,13 +1,17 @@
 /**
  *
  * @typedef {{
- *     create_image: boolean,
- *     modify_image: boolean,
- *     delete_image: boolean,
+ *     images: {
+ *         create: boolean,
+ *         modify: boolean,
+ *         delete: boolean,
+ *         network: boolean
+ *     },
  *     containers: {
- *         create_custom: boolean,
- *         modify_custom: boolean,
- *         delete_custom: boolean
+ *         create: boolean,
+ *         modify: boolean,
+ *         delete: boolean,
+ *         network: boolean
  *     },
  *     networking: {
  *         exposing: boolean,
@@ -16,17 +20,21 @@
  * }}
  */
 const default_permissions = {
-	'create_image': false,
-	'modify_image': false,
-	'delete_image': false,
+	'images'    : {
+		'create' : false,
+		'modify' : false,
+		'delete' : false,
+		'network': false
+	},
 	'containers': {
-		'create_custom': false,
-		'modify_custom': false,
-		'delete_custom': false
+		'create' : false,
+		'modify' : false,
+		'delete' : false,
+		'network': false
 	},
 	'networking': {
 		'exposing': false,
-		'mapping': false,
+		'mapping' : false
 	}
 };
 
@@ -42,8 +50,8 @@ exports.default_permissions = default_permissions;
  */
 const user_type_map = {
 	'master': 0,
-	'admin': 1,
-	'user': 2
+	'admin' : 1,
+	'user'  : 2
 };
 
 exports.user_type_map = user_type_map;
@@ -58,7 +66,7 @@ exports.user_type_map = user_type_map;
  */
 const image_types = {
 	'custom': 0,
-	'hub': 1,
+	'hub'   : 1,
 	'remote': 2
 };
 
@@ -77,7 +85,7 @@ const image_statuses = {
 	'created': 0,
 	'running': 1,
 	'removed': 2,
-	'error': 3
+	'error'  : 3
 };
 
 exports.image_statuses = image_statuses;
@@ -93,12 +101,8 @@ const default_image_options = {
 exports.default_image_options = default_image_options;
 
 const user_default_permissions = {
-	'admin': {
-
-	},
-	'user': {
-
-	}
+	'admin': {},
+	'user' : {}
 };
 
 exports.user_default_permissions = user_default_permissions;
