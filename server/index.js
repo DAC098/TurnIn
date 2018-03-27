@@ -4,6 +4,7 @@ const log = require('modules/log');
 const setup = require('modules/setup');
 const configure = require('modules/setup/configure');
 
+const server = require('./main');
 const loadRoutes = require('./load_routes');
 
 process.on('exit',code => {
@@ -41,14 +42,20 @@ process.on('exit',code => {
 		log.error(err.stack);
 	}
 
-	log.info('starting server');
-	require('./main');
-
 	log.info('loading routes');
 	loadRoutes();
 
 	log.info('running db startup');
 	await db_init.startup();
+
+	try {
+		log.info('opening server for connections');
+		await server.listenAsync(443,'0.0.0.0');
+
+		log.info('server listening for connections',server.address());
+	} catch(err) {
+		log.error(err.stack);
+	}
 
 	if(process.env.NODE_ENV === 'development') {
 		require('./dev');
