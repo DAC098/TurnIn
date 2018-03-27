@@ -17,13 +17,13 @@ const File = require('./File');
 /**
  *
  * @typedef {{
- *  ignore: Array<string>,
-  * depth: number,
-  * with_stats: boolean,
-  * include_file: boolean,
-  * include_dir: boolean,
-  * single_list: boolean,
-  * base: string
+ *  ignore: Array<string>=,
+  * depth: number=,
+  * with_stats: boolean=,
+  * include_file: boolean=,
+  * include_dir: boolean=,
+  * single_list: boolean=,
+  * base: string=
   * }}
  */
 const read_default = {
