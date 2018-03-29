@@ -16,18 +16,26 @@ module.exports = [
 			let con = null;
 
 			try {
-				let pool = db.getPool();
-				con = await pool.connect();
+				con = await db.connect();
 
 				let body = await parser.json(req);
 
-				let update_values = [
-					`title = '${body.title}'`,
-					`num = ${body.num}`,
-					`year = ${body.year}`,
-					`semester = '${body.semester}'`,
-					`teacher_id = ${body.teacher_id}`
-				];
+				let update_values = [];
+
+				if(typeof body.title === 'string')
+					update_values.push(`title = '${body.title}'`);
+
+				if(typeof body.num === 'number')
+					update_values.push(`num = ${body.num}`);
+
+				if(typeof body.year === 'number')
+					update_values.push(`year = ${body.year}`);
+
+				if(typeof body.semester === 'string')
+					update_values.push(`semester = ${body.semester}`);
+
+				if(typeof body.teacher_id === 'number')
+					update_values.push(`teacher_id = ${body.teacher_id}`);
 
 				let update_query = `
 				update sections
@@ -59,8 +67,7 @@ module.exports = [
 			let con = null;
 
 			try {
-				let pool = db.getPool();
-				con = await pool.connect();
+				con = await db.connect();
 
 				let delete_query = `
 				delete from sections
