@@ -40,6 +40,7 @@ process.on('exit',code => {
 		}
 	} catch(err) {
 		log.error(err.stack);
+		return;
 	}
 
 	log.info('loading routes');
@@ -55,6 +56,7 @@ process.on('exit',code => {
 		log.info('server listening for connections',server.address());
 	} catch(err) {
 		log.error(err.stack);
+		return;
 	}
 
 	if(process.env.NODE_ENV === 'development') {
