@@ -12,7 +12,7 @@ const db = require('../../index');
  *     offset: number
  * }}
  * @param con     {SQLConnection=}
- * @returns {Promise<Array>}
+ * @returns {Promise<Array<Object>>}
  */
 const listImages = async (options,con) => {
 	let given_con = con !== null && con !== undefined;
