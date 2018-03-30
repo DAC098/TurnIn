@@ -2,6 +2,7 @@ order:
   - "html.js"
   - "assets.js"
   - "login.js"
+  - "auth.js"
   - "user_validate.js"
   - "users"
   - "students"
