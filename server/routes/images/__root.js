@@ -47,6 +47,14 @@ module.exports = [
 			try {
 				con = await db.connect();
 
+				/**
+				 * @type {{
+				 *     image_name: string,
+				 *     options: variables.default_image_options,
+				 *     image_type: string,
+				 *     image_url: string
+				 * }}
+				 */
 				let body = await parser.json(req);
 				let insert_fields = ['image_owner'];
 				let insert_values = [req.user.id];
