@@ -74,16 +74,12 @@ module.exports = [
 	],
 	[
 		{
-			path: '/*',
+			path: '/html',
 			type: 'mdlwr',
-			methods: 'get'
+			methods: 'get',
+			regex: /\/.*/
 		},
 		async (req,res) => {
-			if(typeof req.headers['accept'] === 'string') {
-				log.info('accept header',req.headers['accept']);
-				log.info('accept text/html?',req.headers['accept'].includes('text/html'));
-			}
-
 			if(typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html')) {
 				res.writeHead(200,{'content-type':'text/html'});
 				await res.endAsync(app_string);
