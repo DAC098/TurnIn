@@ -57,9 +57,9 @@ const exp = {
 	},
 	/**
 	 *
-	 * @param options {Object}
-	 * @param buffer  {Buffer}
-	 * @param offset  {number}
+	 * @param options {Object=}
+	 * @param buffer  {Buffer=}
+	 * @param offset  {number=}
 	 * @returns {string|Buffer}
 	 */
 	uuidV4 : (options,buffer,offset) => {
