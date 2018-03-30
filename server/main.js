@@ -44,7 +44,11 @@ server.on('session',session => {
 		log.debug('session timeout',{uuid:session.pk});
 	});
 
-	log.debug('session connection',{uuid:session.pk});
+	log.debug('session connection',{
+		uuid:session.pk,
+		remote:session.socket.remoteAddress,
+		local:session.socket.localAddress
+	});
 });
 
 server.on('connection',async soc => {
@@ -64,7 +68,11 @@ server.on('connection',async soc => {
 		log.debug('socket timeout',{uuid:soc.pk});
 	});
 
-	log.debug('socket connection',{uuid:soc.pk});
+	log.debug('socket connection',{
+		uuid:soc.pk,
+		remote:soc.remoteAddress,
+		local:soc.localAddress
+	});
 });
 
 server.on('close',async () => {
