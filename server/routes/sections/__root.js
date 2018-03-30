@@ -48,6 +48,15 @@ module.exports = [
 				let pool = db.getPool();
 				con = await pool.connect();
 
+				/**
+				 * @type {{
+				 *     title: string,
+				 *     num: number,
+				 *     year: number,
+				 *     semester: string,
+				 *     teacher_id: number
+				 * }}
+				 */
 				let body = await parser.json(req);
 				let insert_values = [
 					`'${body.title}'`,

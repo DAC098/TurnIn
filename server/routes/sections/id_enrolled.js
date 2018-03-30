@@ -63,6 +63,11 @@ module.exports = [
 
 			try {
 				con = await db.connect();
+				/**
+				 * @type {{
+				 *     ids: Array<number>
+				 * }}
+				 */
 				let body = await parser.json(req);
 				let ids = [];
 
