@@ -62,6 +62,8 @@ const handle = async (req,res) => {
 			send['stack'] = err.stack;
 		}
 
+		log.error(err.stack);
+
 		this.writeHead(500,{'content-type':'application/json'});
 		await this.endJSON(send);
 	};
@@ -85,7 +87,6 @@ const handle = async (req,res) => {
 			});
 		}
 	} catch(err) {
-		log.error(err.stack);
 		await res.endError(err);
 	}
 };
