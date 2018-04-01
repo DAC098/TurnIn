@@ -12,3 +12,10 @@ allow_custom_images BOOLEAN DEFAULT FALSE,
 FOREIGN KEY (section_id) REFERENCES sections(id),
 CONSTRAINT unique_title_section UNIQUE(title,section_id)
 );
+
+CREATE TABLE assignment_files (
+id            SERIAL PRIMARY KEY,
+filename      VARCHAR NOT NULl,
+assignment_id INT NOT NULL,
+FOREIGN KEY (assignment_id) REFERENCES assignments(id)
+);
