@@ -18,6 +18,7 @@ const dockerfile_url = '/:id([0-9]+)/dockerfile';
  */
 const getImageData = async (id,con) => {
 	let should_release = false;
+
 	try {
 		if(con === null) {
 			should_release = true;
@@ -27,6 +28,9 @@ const getImageData = async (id,con) => {
 		let res = await con.query(`
 		select * from images where id = ${typeof id === 'number' ? id : parseInt(id,10)}
 		`);
+
+		if(should_release)
+			con.release();
 
 		if(res.rows.length === 1) {
 			return res.rows[0];
