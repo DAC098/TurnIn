@@ -92,10 +92,18 @@ exports.image_statuses = image_statuses;
 
 /**
  *
- * @typedef {{extract: Array<string>}}
+ * @typedef {{
+ *     extract: string[],
+ *     submission_mount: string,
+ *     build_commands: string|string[],
+ *     test_commands: string[],
+ * }}
  */
 const default_image_options = {
-	extract: []
+	extract: [],
+	submission_mount: '/app',
+	build_commands: [],
+	test_commands: []
 };
 
 exports.default_image_options = default_image_options;
