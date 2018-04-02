@@ -72,5 +72,125 @@
       "semester": "'winter'",
       "teacher_id": "(select id from users where username = 'teacher_one')"
     }
+  ],
+  "images": [
+    {
+      "image_owner": "(select id from users where username = 'teacher_two')",
+      "image_name": "'node:9.10.0'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    },
+    {
+      "image_owner": "(select id from users where username = 'teacher_two')",
+      "image_name": "'ubuntu:16.04'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    },
+    {
+      "image_owner": "(select id from users where username = 'teacher_two')",
+      "image_name": "'postgres:10.1'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    },
+    {
+      "image_owner": "(select id from users where username = 'teacher_one')",
+      "image_name": "'node:8.11.1'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    },
+    {
+      "image_owner": "(select id from users where username = 'teacher_one')",
+      "image_name": "'redis:latest'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    },
+    {
+      "image_owner": "(select id from users where username = 'teacher_one')",
+      "image_name": "'node:6.14.1'",
+      "options": {
+        "extract": [],
+        "submission_mount": "/app",
+        "build_commands": [],
+        "test_commands": []
+      },
+      "image_type": "'hub'",
+      "image_status": "'ready'",
+      "image_exists": true
+    }
+  ],
+  "assignments": [
+    {
+      "title": "'first assignment'",
+      "section_id": "(select id from sections where title = 'CSCI 111')",
+      "description": "'the first assignment of the class'",
+      "points": 100
+    },
+    {
+      "title": "'second assignment'",
+      "section_id": "(select id from sections where title = 'CSCI 111')",
+      "description": "'the second assignment of the class'",
+      "points": 100
+    },
+    {
+      "title": "'third assignment'",
+      "section_id": "(select id from sections where title = 'CSCI 111')",
+      "description": "'the third assignment of the class'",
+      "points": 100
+    },
+    {
+      "title": "'fourth assignment'",
+      "section_id": "(select id from sections where title = 'CSCI 111')",
+      "description": "'the fourth assignment of the class'",
+      "points": 100
+    }
+  ],
+  "assignment_images": [
+    {
+      "image_id": "(select id from images where image_name = 'node:9.10.0')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'first assignment' and sections.title = 'CSCI 111')"
+    },
+    {
+      "image_id": "(select id from images where image_name = 'node:9.10.0')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'second assignment' and sections.title = 'CSCI 111')"
+    },
+    {
+      "image_id": "(select id from images where image_name = 'node:9.10.0')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'third assignment' and sections.title = 'CSCI 111')"
+    }
   ]
 }
