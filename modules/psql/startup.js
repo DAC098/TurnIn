@@ -1,14 +1,15 @@
 const process = require('process');
+const n_path = require('path');
 
 const db = require('./index');
 const log = require('../log');
 const security = require('../security');
+const setup = require('../setup');
 
 const createUser = require('./helpers/createUser');
 
 const File = require('../fs/File');
-
-const is_dev = process.env.NODE_ENV;
+const Dir = require('../fs/Dir');
 
 const wait = time => {
 	return new Promise((resolve) => {
@@ -76,6 +77,84 @@ const loadTestData = async () => {
 					(${values.join(',')})
 					on conflict on constraint unique_sections do nothing
 					`;
+
+				let result = await con.query(insert);
+			} catch(err) {
+				log.error(err.stack);
+			}
+		}
+
+		let result = await con.query('select * from images');
+
+		if(result.rows.length < 6) {
+			for(let test_image of test_data.images) {
+				try {
+					let keys = Object.keys(test_image);
+					let values = [];
+
+					for(let k of keys) {
+						if(typeof test_image[k] === 'object') {
+							values.push(`'${JSON.stringify(test_image[k])}'`);
+						} else {
+							values.push(test_image[k]);
+						}
+					}
+
+					let insert = `
+					insert into images (${keys.join(',')}) values
+					(${values.join(',')})`;
+
+					let result = await con.query(insert);
+				} catch(err) {
+					log.error(err.stack);
+				}
+			}
+		}
+
+		for(let test_assignment of test_data.assignments) {
+			try {
+				let keys = Object.keys(test_assignment);
+				let values = [];
+
+				for(let k of keys) {
+					values.push(test_assignment[k]);
+				}
+
+				let insert = `
+				insert into assignments (${keys.join(',')}) values
+				(${values.join(',')})
+				on conflict on constraint unique_title_section do nothing
+				returning *`;
+
+				let result = await con.query(insert);
+
+				if(result.rows.length === 1) {
+					let dir_path = n_path.join(
+						setup.getKey('directories.data_root'),
+						'assignments',
+						`${result.rows[0].id}`
+					);
+
+					await Dir.make(dir_path);
+				}
+			} catch(err) {
+				log.error(err.stack);
+			}
+		}
+
+		for(let test_assignment_image of test_data.assignment_images) {
+			try {
+				let keys = Object.keys(test_assignment_image);
+				let values = [];
+
+				for(let k of keys) {
+					values.push(test_assignment_image[k]);
+				}
+
+				let insert = `
+				insert into assignment_images (${keys.join(',')}) values
+				(${values.join(',')})
+				on conflict on constraint image_assignment_pk do nothing`;
 
 				let result = await con.query(insert);
 			} catch(err) {
