@@ -15,7 +15,10 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
+			let con = null;
+
 			try {
+				con = await db.connect();
 				let options  = {};
 
 				if(req.user.type === 'master' || req.user.permission.image.modify) {
@@ -24,7 +27,7 @@ module.exports = [
 					options.owner_id = req.user.id;
 				}
 
-				let result = await listImages(options);
+				let result = await listImages(options,con);
 
 				await res.endJSON({
 					'length': result.length,
@@ -33,6 +36,9 @@ module.exports = [
 			} catch(err) {
 				await res.endError(err);
 			}
+
+			if(con)
+				con.release();
 		}
 	],
 	[
