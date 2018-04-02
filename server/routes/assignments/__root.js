@@ -1,4 +1,9 @@
+const n_path = require('path');
+
 const db = require('modules/psql');
+const setup = require('modules/setup');
+const log = require('modules/log');
+const Dir = require('modules/fs/Dir');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 const parser = require('modules/parser');
@@ -103,6 +108,8 @@ module.exports = [
 
 				con = await db.connect();
 
+				await con.beginTrans();
+
 				let query = `
 				insert into assignments (${insert_fields.join(',')}) values
 				(${insert_values.join(',')})
@@ -111,12 +118,32 @@ module.exports = [
 
 				let result = await con.query(query);
 
-				await res.endJSON({
-					'length': result.rows.length,
-					'result': result.rows
-				});
+				if(result.rows.length === 1) {
+					let assignment_id = result.rows[0].id;
+
+					await Dir.make(n_path.join(
+						setup.getKey('directories.data_root'),
+						'assignments',
+						`${assignment_id}`
+					));
+
+					await con.commitTrans();
+
+					await res.endJSON({
+						'length': result.rows.length,
+						'result': result.rows
+					});
+				} else {
+					await res.endJSON(500,{
+						'message': 'unable to create assignment'
+					});
+					await con.rollbackTrans();
+				}
 			} catch(err) {
-				await res.endError(err);
+				if(con)
+					await con.rollbackTrans();
+
+				await res.endError(err,'unable to create assignment');
 			}
 
 			if(con)

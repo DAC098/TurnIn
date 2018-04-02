@@ -1,8 +1,14 @@
+const n_path = require('path');
+
 const db = require('modules/psql');
+const setup = require('modules/setup');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 const parser = require('modules/parser');
+const Dir = require('modules/fs/Dir');
 const log = require('modules/log');
+
+const getAssignmentData = require('./getAssignmentData');
 
 const id_assignment_path = '/:id([0-9]+)';
 
@@ -18,33 +24,12 @@ module.exports = [
 			try {
 				con = await db.connect();
 
-				let query = `
-				select 
-					assignments.*,
-					assignment_files.filename as files__name,
-					images.id as images__id,
-					images.image_name as images__name,
-					images.options as images__options,
-					images.image_type as images__type,
-					images.image_status as images__status
-				from assignments
-				join assignment_files on
-					assignment_files.assignment_id = assignments.id
-				join assignment_images on 
-					assignment_images.assignment_id = assignments.id
-				join images on
-					images.id = assignment_images.image_id
-				where
-					assignments.id = ${req.params.id}
-				order by
-					assignments.title`;
-
-				let result = await con.query(query);
-				let parse_rows = db.util.createObject(result.rows,{array_keys:['files','images']});
+				let result = await getAssignmentData(req.params.id,con);
+				let found = result !== undefined;
 
 				await res.endJSON({
-					'length': parse_rows.length,
-					'result': parse_rows
+					'length': found ? 1 : 0,
+					'result': found ? [result] : []
 				});
 			} catch(err) {
 				await res.endError(err);
@@ -112,13 +97,20 @@ module.exports = [
 				returning *
 				`;
 
+				await con.beginTrans();
+
 				let result = await con.query(query);
+
+				await con.commitTrans();
 
 				await res.endJSON({
 					'length': result.rows.length,
 					'result': result.rows
 				});
 			} catch(err) {
+				if(con)
+					await con.rollbackTrans();
+
 				await res.endError(err);
 			}
 
@@ -146,6 +138,12 @@ module.exports = [
 
 				let result = await con.query(query);
 
+				await Dir.remove(n_path.join(
+					setup.getKey('directories.data_root'),
+					'assignments',
+					`${req.params.id}`
+				),true);
+
 				await con.commitTrans();
 
 				await res.endJSON({
@@ -153,7 +151,8 @@ module.exports = [
 					'result': result.rows
 				});
 			} catch(err) {
-				await con.rollbackTrans();
+				if(con)
+					await con.rollbackTrans();
 
 				await res.endError(err);
 			}
