@@ -1,11 +1,25 @@
 const _ = require('lodash');
 
+/**
+ *
+ * @typedef {{
+ *     array_keys: Array<string>=,
+ *     id_field: string=,
+ *     field_separator: string=
+ * }}
+ */
 const to_object_defaults = {
 	array_keys: [],
 	id_field: 'id',
 	field_separator: '__'
 };
 
+/**
+ *
+ * @param res     {Array<Object>}
+ * @param options {to_object_defaults=}
+ * @returns {Object[]}
+ */
 const createObject = (res, options) => {
 	let opts = _.merge({},to_object_defaults,options);
 

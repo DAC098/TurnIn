@@ -10,6 +10,53 @@ module.exports = [
 	[
 		{
 			path: id_assignment_path,
+			methods: 'get'
+		},
+		async (req,res) => {
+			let con = null;
+
+			try {
+				con = await db.connect();
+
+				let query = `
+				select 
+					assignments.*,
+					assignment_files.filename as files__name,
+					images.id as images__id,
+					images.image_name as images__name,
+					images.options as images__options,
+					images.image_type as images__type,
+					images.image_status as images__status
+				from assignments
+				join assignment_files on
+					assignment_files.assignment_id = assignments.id
+				join assignment_images on 
+					assignment_images.assignment_id = assignments.id
+				join images on
+					images.id = assignment_images.image_id
+				where
+					assignments.id = ${req.params.id}
+				order by
+					assignments.title`;
+
+				let result = await con.query(query);
+				let parse_rows = db.util.createObject(result.rows,{array_keys:['files','images']});
+
+				await res.endJSON({
+					'length': parse_rows.length,
+					'result': parse_rows
+				});
+			} catch(err) {
+				await res.endError(err);
+			}
+
+			if(con)
+				con.release();
+		}
+	],
+	[
+		{
+			path: id_assignment_path,
 			methods: 'put'
 		},
 		isJsonContent(),

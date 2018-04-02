@@ -14,8 +14,16 @@ CONSTRAINT unique_title_section UNIQUE(title,section_id)
 );
 
 CREATE TABLE assignment_files (
-id            SERIAL PRIMARY KEY,
-filename      VARCHAR NOT NULl,
+filename      VARCHAR NOT NULL,
 assignment_id INT NOT NULL,
-FOREIGN KEY (assignment_id) REFERENCES assignments(id)
+FOREIGN KEY (assignment_id) REFERENCES assignments(id),
+CONSTRAINT assignment_filename_pk PRIMARY KEY (filename,assignment_id)
+);
+
+CREATE TABLE assignment_images (
+image_id INT NOT NULL,
+assignment_id INT NOT NULL,
+FOREIGN KEY (image_id) REFERENCES images(id),
+FOREIGN KEY (assignment_id) REFERENCES assignments(id),
+CONSTRAINT image_assignment_pk PRIMARY KEY (image_id,assignment_id)
 );

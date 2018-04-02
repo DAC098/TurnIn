@@ -85,12 +85,48 @@ module.exports = [
 			try {
 				con = await db.connect();
 
-				await con.beginTrans();
+				let query = `
+				select *
+				from assignment_files
+				where
+					assignment_id = ${req.assignment.id}
+				order by 
+					filename`;
 
+				let results = await con.query(query);
 
+				await res.endJSON({
+					'length': results.rows.length,
+					'result': results.rows
+				});
 			} catch(err) {
-
+				await res.endError(err);
 			}
+
+			if(con)
+				con.release();
+		}
+	],
+	[
+		{
+			path: id_files_path,
+			methods: 'post'
+		},
+		async (req,res) => {
+			await res.endJSON({
+				'message': 'ok'
+			});
+		}
+	],
+	[
+		{
+			path: id_files_path,
+			methods: 'delete'
+		},
+		async (req,res) => {
+			await res.endJSON({
+				'message': 'ok'
+			});
 		}
 	]
 ];

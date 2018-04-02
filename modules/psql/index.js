@@ -16,4 +16,6 @@ const db = new SQLPool({},common_connection,{
 	}
 });
 
+db['util'] = require('./util');
+
 module.exports = db;
