@@ -63,10 +63,12 @@ module.exports = [
 				let body = await parser.json(req);
 				let insert_fields = [];
 				let insert_values = [];
+				let inserts = new db.util.QueryBuilder();
 
 				if(typeof body.title === 'string') {
 					insert_fields.push('title');
 					insert_values.push(`'${body.title}'`);
+					inserts.strField('title',body.title);
 				} else {
 					await res.endJSON(400,{
 						'message': 'title is required for the assignment'
@@ -77,6 +79,7 @@ module.exports = [
 				if(typeof body.section_id === 'number') {
 					insert_fields.push('section_id');
 					insert_values.push(`${body.section_id}`);
+					inserts.numField('section_id',body.section_id);
 				} else {
 					await res.endJSON(400,{
 						'message': 'section_id is required for the assignment'
@@ -87,23 +90,27 @@ module.exports = [
 				if(typeof body.description === 'string') {
 					insert_fields.push('description');
 					insert_values.push(`'${body.description}'`);
+					inserts.strField('description',body.description);
 				}
 
 				if(typeof body.points === 'number') {
 					insert_fields.push('points');
 					insert_values.push(`${body.points}`);
+					inserts.numField('points',body.points);
 				}
 
 				if(typeof body.open_date === 'string') {
 					let date = new Date(body.open_date);
 					insert_fields.push('open_date');
 					insert_values.push(`'${date.toUTCString()}'`);
+					inserts.strField('open_date',date.toUTCString());
 				}
 
 				if (typeof body.close_date === 'string') {
 					let date = new Date(body.close_date);
 					insert_fields.push('close_date');
 					insert_values.push(`'${date.toUTCString()}'`);
+					inserts.strField('close_date',date.toUTCString());
 				}
 
 				con = await db.connect();
@@ -111,10 +118,12 @@ module.exports = [
 				await con.beginTrans();
 
 				let query = `
-				insert into assignments (${insert_fields.join(',')}) values
-				(${insert_values.join(',')})
+				insert into assignments (${inserts.getFieldsStr()}) values
+				(${inserts.getValuesStr()})
 				returning *
 				`;
+
+				log.debug('test_query',query);
 
 				let result = await con.query(query);
 
