@@ -137,3 +137,133 @@ const createObject = (res, options) => {
 };
 
 exports.createObject = createObject;
+
+const inserts_sym = Symbol('inserts');
+
+class QueryBuilder {
+	constructor() {
+		this[inserts_sym] = new Map();
+	}
+
+	static sanitize(type,value) {
+		switch(type) {
+			case 'string':
+				let rtn = `${value}`;
+				rtn = rtn
+					.replace(/\\?'/g,'\'\'');
+				return rtn;
+			case 'bool':
+				return typeof value === 'boolean' ? value : !!value;
+			case 'number':
+				return typeof value === 'number' ? value : parseInt(`${value}`,10);
+			default:
+				return value;
+		}
+	}
+
+	tag(strings,...keys) {
+		let str_iterator = strings[Symbol.iterator]();
+		let keys_iterator = keys[Symbol.iterator]();
+
+		let str_iter = str_iterator.next();
+		let keys_iter = keys_iterator.next();
+
+		let rtn = '';
+
+		while(!str_iter.done && !keys_iter.done) {
+			rtn += str_iter.value;
+
+			if(typeof keys_iter.value === 'function') {
+				rtn += keys_iter.value.call(null,this);
+			}
+
+			str_iter = str_iterator.next();
+			keys_iter = keys_iterator.next();
+		}
+
+		return rtn;
+	}
+
+
+
+	strField(field,value) {
+		this[inserts_sym].set(
+			QueryBuilder.sanitize('string',field),
+			{
+				type: 'string',
+				value: QueryBuilder.sanitize('string',value)
+			}
+		);
+	}
+
+	numField(field,value) {
+		this[inserts_sym].set(
+			QueryBuilder.sanitize('string',field),
+			{
+				type: 'number',
+				value: QueryBuilder.sanitize('number',value)
+			}
+		);
+	}
+
+	boolField(field,value) {
+		this[inserts_sym].set(
+			QueryBuilder.sanitize('string',field),
+			{
+				type: 'bool',
+				value: QueryBuilder.sanitize('bool',value)
+			}
+		);
+	}
+
+	getValue(field) {
+		let rtn = this[inserts_sym].get(field);
+		return rtn !== undefined ? rtn.value : undefined;
+	}
+
+	getValueStr(field) {
+		let f = this[inserts_sym].get(field);
+
+		if(f !== undefined) {
+			switch(f.type) {
+				case 'number':
+				case 'bool':
+					return `${f.value}`;
+				case 'string':
+					return `'${f.value}'`;
+			}
+		} else {
+			return '';
+		}
+	}
+
+	getFields() {
+		return Array.from(this[inserts_sym].keys());
+	}
+
+	getFieldsStr() {
+		return this.getFields().join(',');
+	}
+
+	getValues() {
+		let rtn = [];
+
+		for(let [k,v] of this[inserts_sym]) {
+			rtn.push(v.value);
+		}
+
+		return rtn;
+	}
+
+	getValuesStr() {
+		let rtn = [];
+
+		for(let [k,v] of this[inserts_sym]) {
+			rtn.push(this.getValueStr(k));
+		}
+
+		return rtn.join(',');
+	}
+}
+
+exports.QueryBuilder = QueryBuilder;
