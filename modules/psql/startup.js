@@ -1,10 +1,13 @@
 const process = require('process');
 const n_path = require('path');
 
+const _ = require('lodash');
+
 const db = require('./index');
 const log = require('../log');
 const security = require('../security');
 const setup = require('../setup');
+const variables = require('../variables');
 
 const createUser = require('./helpers/createUser');
 
@@ -94,7 +97,8 @@ const loadTestData = async () => {
 
 					for(let k of keys) {
 						if(typeof test_image[k] === 'object') {
-							values.push(`'${JSON.stringify(test_image[k])}'`);
+							let str = JSON.stringify(_.merge({},variables.default_image_options,test_image[k]));
+							values.push(`'${str}'`);
 						} else {
 							values.push(test_image[k]);
 						}
@@ -117,7 +121,11 @@ const loadTestData = async () => {
 				let values = [];
 
 				for(let k of keys) {
-					values.push(test_assignment[k]);
+					if(typeof test_assignment[k] === 'object') {
+						values.push(`'${JSON.stringify(_.merge({},variables.default_assignment_options,test_assignment[k]))}'`);
+					} else {
+						values.push(test_assignment[k]);
+					}
 				}
 
 				let insert = `
