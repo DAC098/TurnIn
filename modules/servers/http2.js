@@ -100,6 +100,10 @@ class http2Server extends EventEmitter {
 				await this.closeConnections();
 			}
 		});
+
+		this.instance.on('error',err => {
+			this.emit('error',err);
+		});
 	}
 
 	async closeSessions() {
@@ -147,7 +151,7 @@ class http2Server extends EventEmitter {
 
 	listen(...args) {
 		return new Promise((resolve,reject) => {
-			this.listen(...args,(err) => {
+			this.instance.listen(...args,(err) => {
 				if(err)
 					reject(err);
 				else
