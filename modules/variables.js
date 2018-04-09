@@ -114,3 +114,21 @@ const user_default_permissions = {
 };
 
 exports.user_default_permissions = user_default_permissions;
+
+/**
+ *
+ * @typedef {{
+ *     extract: string[],
+ *     mount_point: string,
+ *     working_dir: string,
+ *     exec: string[]
+ * }}
+ */
+const default_assignment_options = {
+	extract: [],
+	mount_point: '/app',
+	working_dir: '/app',
+	exec: []
+};
+
+exports.default_assignment_options = default_assignment_options;
