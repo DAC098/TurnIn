@@ -158,25 +158,29 @@
       "title": "'first assignment'",
       "section_id": "(select id from sections where title = 'CSCI 111')",
       "description": "'the first assignment of the class'",
-      "points": 100
+      "points": 100,
+      "options": {}
     },
     {
       "title": "'second assignment'",
       "section_id": "(select id from sections where title = 'CSCI 111')",
       "description": "'the second assignment of the class'",
-      "points": 100
+      "points": 100,
+      "options": {}
     },
     {
       "title": "'third assignment'",
       "section_id": "(select id from sections where title = 'CSCI 111')",
       "description": "'the third assignment of the class'",
-      "points": 100
+      "points": 100,
+      "options": {}
     },
     {
       "title": "'fourth assignment'",
       "section_id": "(select id from sections where title = 'CSCI 111')",
       "description": "'the fourth assignment of the class'",
-      "points": 100
+      "points": 100,
+      "options": {}
     }
   ],
   "assignment_images": [
