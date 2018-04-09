@@ -271,11 +271,15 @@ class Dir {
 
 	/**
 	 *
-	 * @param path {string}
+	 * @param path {string|string[]}
 	 * @param mode {string=}
 	 * @returns {Promise<void>}
 	 */
 	static async make(path,mode) {
+		if(Array.isArray(path)) {
+			path = nPath.join(path);
+		}
+
 		let parse = nPath.parse(path);
 		let check = parse.root;
 		let parts = nPath.join(parse.dir.replace(parse.root,''),parse.base).split(nPath.sep);
