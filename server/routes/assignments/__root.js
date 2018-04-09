@@ -1,9 +1,12 @@
 const n_path = require('path');
 
+const _ = require("lodash");
+
 const db = require('modules/psql');
 const setup = require('modules/setup');
 const log = require('modules/log');
 const Dir = require('modules/fs/Dir');
+const variables = require('modules/variables');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
 const parser = require('modules/parser');
@@ -57,17 +60,19 @@ module.exports = [
 				 *     description: string,
 				 *     points: number=,
 				 *     open_date: string=,
-				 *     close_date: string=
+				 *     close_date: string=,
+				 *     options: {
+				 *         extract: string[]=,
+				 *         mount_point: string=,
+				 *         working_dir: string=,
+				 *         exec: string[]=
+				 *     }=
 				 * }}
 				 */
 				let body = await parser.json(req);
-				let insert_fields = [];
-				let insert_values = [];
 				let inserts = new db.util.QueryBuilder();
 
 				if(typeof body.title === 'string') {
-					insert_fields.push('title');
-					insert_values.push(`'${body.title}'`);
 					inserts.strField('title',body.title);
 				} else {
 					await res.endJSON(400,{
@@ -77,8 +82,6 @@ module.exports = [
 				}
 
 				if(typeof body.section_id === 'number') {
-					insert_fields.push('section_id');
-					insert_values.push(`${body.section_id}`);
 					inserts.numField('section_id',body.section_id);
 				} else {
 					await res.endJSON(400,{
@@ -88,29 +91,25 @@ module.exports = [
 				}
 
 				if(typeof body.description === 'string') {
-					insert_fields.push('description');
-					insert_values.push(`'${body.description}'`);
 					inserts.strField('description',body.description);
 				}
 
 				if(typeof body.points === 'number') {
-					insert_fields.push('points');
-					insert_values.push(`${body.points}`);
 					inserts.numField('points',body.points);
 				}
 
 				if(typeof body.open_date === 'string') {
 					let date = new Date(body.open_date);
-					insert_fields.push('open_date');
-					insert_values.push(`'${date.toUTCString()}'`);
 					inserts.strField('open_date',date.toUTCString());
 				}
 
 				if (typeof body.close_date === 'string') {
 					let date = new Date(body.close_date);
-					insert_fields.push('close_date');
-					insert_values.push(`'${date.toUTCString()}'`);
 					inserts.strField('close_date',date.toUTCString());
+				}
+
+				if (typeof body.options === 'object') {
+					inserts.strField('options',JSON.stringify(_.merge({},variables.default_assignment_options,body.options)));
 				}
 
 				con = await db.connect();
@@ -122,8 +121,6 @@ module.exports = [
 				(${inserts.getValuesStr()})
 				returning *
 				`;
-
-				log.debug('test_query',query);
 
 				let result = await con.query(query);
 
