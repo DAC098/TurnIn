@@ -12,6 +12,10 @@ const opts = {
 
 const server = new http2Server(opts);
 
+server.on('error',err => {
+	log.error(err.stack);
+});
+
 server.on('session-close',pk => {
 	log.debug('session close',{uuid:pk});
 });
