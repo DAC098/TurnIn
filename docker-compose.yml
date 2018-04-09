@@ -3,7 +3,7 @@ version: "3"
 
 services:
   asset-bundle:
-    image: "node:9.10.0"
+    image: "node:9.10.1"
     volumes:
       - "./:/app"
     working_dir: "/app"
@@ -11,7 +11,7 @@ services:
       - "NODE_ENV=development"
     command: "./node_modules/.bin/webpack --config webpack.config.js --watch"
   server:
-    image: "node:9.10.0"
+    image: "node:9.10.1"
     depends_on:
       - redis
       - psql
@@ -27,8 +27,8 @@ services:
       - "443:443"
     restart: unless-stopped
     command: "node ./server/index.js --c-psql.hostname psql --c-redis.hostname redis"
-  socket:
-    image: "node:9.10.0"
+  worker:
+    image: "node:9.10.1"
     depends_on:
       - redis
       - psql
@@ -40,10 +40,10 @@ services:
     working_dir: "/app"
     environment:
       - "NODE_ENV=development"
-    ports:
-      - "8443:443"
-    restart: unless-stopped
-    command: "node ./socket/index.js --c-psql.hostname psql --c-redis.hostname redis"
+    expose:
+      - "443"
+    restart: "unless-stopped"
+    command: "node ./worker/index.js --c-psql.hostname psql --c-redis.hostname redis"
   redis:
     image: "redis:4.0.6"
     expose:
