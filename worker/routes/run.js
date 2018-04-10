@@ -8,5 +8,7 @@ router.addRoute({
 	methods: 'post'
 },
 	async (req,res) => {
-
+		await req.endJSON({
+			'message':'ok'
+		});
 	});
