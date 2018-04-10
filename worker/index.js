@@ -31,6 +31,8 @@ process.on('uncaughtException',err => {
 
 	const db_init = require('modules/psql/startup');
 
+	db_init.setupPool();
+
 	try {
 		log.info('checking database connection');
 

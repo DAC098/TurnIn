@@ -27,6 +27,8 @@ process.on('exit',code => {
 
 	const db_init = require('modules/psql/startup');
 
+	db_init.setupPool();
+
 	try {
 		log.info('checking database connection');
 
@@ -53,7 +55,7 @@ process.on('exit',code => {
 		log.info('opening server for connections');
 		await server.listenAsync(443,'0.0.0.0');
 
-		log.info('server listening for connections',server.address());
+		log.info('server listening',server.address());
 	} catch(err) {
 		log.error(err.stack);
 		return;
