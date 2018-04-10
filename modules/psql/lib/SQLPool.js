@@ -54,18 +54,20 @@ class SQLPool {
 
 	/**
 	 *
-	 * @param name    {string}
-	 * @param options {Object=}
+	 * @param options     {Object=}
+	 * @param name        {string=}
 	 * @returns {SQLWrapper}
 	 */
-	createPool(name,options) {
+	createPool(options,name = 'default') {
 		if(this.connections.has(name)) {
 			let conn = this.connections.get(name);
 
 			conn.last_used = Date.now();
 
-			if(conn.c.closed) {
-				conn.c = new SQLWrapper(_.merge({},this.common_connection,conn.options));
+			if(typeof options === 'object') {
+				let config = _.merge({},conn.config,options);
+				conn.c = new SQLWrapper(config);
+				conn.config = config;
 			}
 
 			this.connections.set(name,conn);
@@ -78,7 +80,7 @@ class SQLPool {
 		let conn = {
 			c: new SQLWrapper(config),
 			last_used: Date.now(),
-			options,
+			config,
 		};
 
 		this.connections.set(name,conn);
@@ -144,6 +146,14 @@ class SQLPool {
 		} else {
 			return null;
 		}
+	}
+
+	setCommonConnection(common) {
+		this.common_connection = _.clone(common);
+	}
+
+	setDefaultOptions(options) {
+		this.options = _.merge({},this.options,options);
 	}
 }
 

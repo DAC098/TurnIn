@@ -214,3 +214,19 @@ const startup = async () => {
 };
 
 exports.startup = startup;
+
+const setupPool = () => {
+	db.setCommonConnection({
+		host: setup.getKey('psql.hostname'),
+		port: setup.getKey('psql.port'),
+		connectionLimit: 20,
+		user: setup.getKey('psql.username'),
+		password: setup.getKey('psql.password')
+	});
+
+	db.createPool({
+		database: 'turnin'
+	});
+};
+
+exports.setupPool = setupPool;
