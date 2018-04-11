@@ -1,5 +1,7 @@
 ---
 order:
   - "id.js"
+  - "id_middleware.js"
   - "id_files.js"
+  - "id_submissions.js"
 ...

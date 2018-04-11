@@ -3,51 +3,13 @@ const n_path = require('path');
 
 const setup = require('modules/setup');
 const db = require('modules/psql');
-const log = require('modules/log');
+
 const pump = require('modules/streaming/asyncPump');
 const File = require('modules/fs/File');
-
-const getAssignmentData = require('./getAssignmentData');
 
 const id_files_path = '/:id([0-9]+)/files';
 
 module.exports = [
-	[
-		{
-			path: id_files_path,
-			type: 'mdlwr',
-			methods: ['get','post','delete']
-		},
-		async (req,res) => {
-			let con = null;
-
-			try {
-				con = await db.connect();
-
-				let assignment = await getAssignmentData(req.params.id,con);
-
-				con.release();
-
-				if(assignment === undefined) {
-					await res.endJSON(404,{
-						'message': 'assignment not found id db'
-					});
-					return false;
-				}
-
-				req['assignment'] = assignment;
-			} catch(err) {
-				if(con)
-					con.release();
-
-				await res.endError(err);
-				return false;
-			}
-
-			if(con)
-				con.release();
-		}
-	],
 	[
 		{
 			path: id_files_path,

@@ -8,7 +8,7 @@ const parser = require('modules/parser');
 const Dir = require('modules/fs/Dir');
 const log = require('modules/log');
 
-const getAssignmentData = require('./getAssignmentData');
+const getAssignmentData = require('modules/psql/helpers/getAssignmentData');
 
 const id_assignment_path = '/:id([0-9]+)';
 
