@@ -18,10 +18,6 @@ const handle = async (req,res) => {
 		});
 	};
 
-	res['endJSONSync'] = function(obj,cb) {
-		this.end(JSON.stringify(obj),cb);
-	};
-
 	res['endJSON'] = function(...args) {
 		let obj = {};
 		let status = 200;
