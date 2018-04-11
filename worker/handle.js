@@ -18,17 +18,17 @@ const handle = async (req,res) => {
 		});
 	};
 
-	res['endJSONSync'] = function(obj,cb) {
-		this.end(JSON.stringify(obj),cb);
-	};
-
 	res['endJSON'] = function(...args) {
 		let obj = {};
 		let status = 200;
 		let headers = {'content-type':'application/json'};
 
 		if(args.length === 1) {
-			obj = args[0];
+			if(typeof args[0] === 'number') {
+				status = args[0];
+			} else {
+				obj = args[0];
+			}
 		}
 
 		if(args.length === 2) {
