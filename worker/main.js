@@ -4,58 +4,65 @@ const log = require('modules/log');
 const http2Server = require('modules/servers/http2');
 const File = require('modules/fs/File');
 
-const handle = require('./handle');
-
 const opts = {
 	key: File.readSync(setup.getKey('tls.key')),
 	cert: File.readSync(setup.getKey('tls.cert')),
 	allowHTTP1: true
 };
 
-const server = new http2Server(opts);
+const server = new http2Server(opts,{secure: false});
+
+module.exports = server;
+
+const handle = require('./handle');
 
 server.setHandle(async (req,res) => {
 	await handle(req,res);
+	log.debug('request complete');
 });
 
 server.on('error',err => {
 	log.error(err.stack);
 });
 
-server.on('session-close',pk => {
-	log.debug('session close',{uuid:pk});
+server.on('close',async () => {
+	log.info('server closed',{
+		connections: await server.getConnections()
+	});
 });
 
-server.on('session-error',(pk,err) => {
-	log.error(`session uuid:${pk}`,err.stack);
+server.on('session',session => {
+	session.on('close',() => {
+		log.debug('session close',{uuid:session.pk});
+	});
+
+	session.on('error',err => {
+		log.error(`session uuid:${session.pk}`,err.stack);
+	});
+
+	session.on('timeout',() => {
+		log.debug('session timeout',{uuid:session.pk});
+	});
+
+	session.on('connect',(...args) => {
+		log.debug('session connect',{uuid:session.pk});
+	});
+
+	log.debug('session connection',{uuid:session.pk});
 });
 
-server.on('session-timeout',pk => {
-	log.debug('session timeout',{uuid:pk});
-});
+server.on('connection',socket => {
+	socket.on('close',() => {
+		log.debug('socket close',{uuid:socket.pk});
+	});
 
-server.on('session-connect',pk => {
-	log.debug('session connect',{uuid:pk});
-});
+	socket.on('error',err => {
+		log.debug(`socket uuid:${socket.pk}`,err.stack);
+	});
 
-server.on('session-created',pk => {
-	log.debug('session connection',{uuid:pk});
-});
+	socket.on('timeout',() => {
+		log.debug('socket timeout',{uuid:socket.pk});
+	});
 
-server.on('socket-close',pk => {
-	log.debug('socket close',{uuid:pk});
+	log.debug('socket created',{uuid:socket.pk});
 });
-
-server.on('socket-error',(pk,err) => {
-	log.debug(`socket uuid:${pk}`,err.stack);
-});
-
-server.on('socket-timeout',pk => {
-	log.debug('socket timeout',{uuid:pk});
-});
-
-server.on('socket-created',pk => {
-	log.debug('socket created',{uuid:pk});
-});
-
-module.exports = server;
