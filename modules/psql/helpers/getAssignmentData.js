@@ -1,4 +1,4 @@
-const db = require('modules/psql');
+const db = require('../index');
 
 /**
  *
@@ -27,25 +27,25 @@ const db = require('modules/psql');
  */
 const getAssignmentData = async(id,con) => {
 	let query = `
-				select 
-					assignments.*,
-					assignment_files.filename as files__name,
-					images.id as images__id,
-					images.image_name as images__name,
-					images.options as images__options,
-					images.image_type as images__type,
-					images.image_status as images__status
-				from assignments
-				left join assignment_files on
-					assignment_files.assignment_id = assignments.id
-				left join assignment_images on 
-					assignment_images.assignment_id = assignments.id
-				left join images on
-					images.id = assignment_images.image_id
-				where
-					assignments.id = ${id}
-				order by
-					assignments.title`;
+	select 
+		assignments.*,
+		assignment_files.filename as files__name,
+		images.id as images__id,
+		images.image_name as images__name,
+		images.options as images__options,
+		images.image_type as images__type,
+		images.image_status as images__status
+	from assignments
+	left join assignment_files on
+		assignment_files.assignment_id = assignments.id
+	left join assignment_images on 
+		assignment_images.assignment_id = assignments.id
+	left join images on
+		images.id = assignment_images.image_id
+	where
+		assignments.id = ${id}
+	order by
+		assignments.title`;
 
 	let result = await con.query(query);
 	let assignment = db.util.createObject(result.rows,{array_keys:['files','images']});
