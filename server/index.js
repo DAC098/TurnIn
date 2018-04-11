@@ -3,12 +3,17 @@ const process = require('process');
 const log = require('modules/log');
 const setup = require('modules/setup');
 const configure = require('modules/setup/configure');
+const wkr = require('modules/worker');
 
 const server = require('./main');
 const loadRoutes = require('./load_routes');
 
 process.on('exit',code => {
 	log.warn('process exiting',{code});
+});
+
+process.on('beforeExit',async () => {
+	await wkr.close();
 });
 
 (async () => {
