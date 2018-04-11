@@ -1,13 +1,31 @@
 const http2 = require('http2');
 const EventEmitter = require('events');
 
+const _ = require("lodash");
+
 const security = require('../security');
 
+/**
+ *
+ * @typedef {{
+ *     secure: boolean=
+ * }}
+ */
+const default_options = {
+	secure: true
+};
+
 class http2Server extends EventEmitter {
-	constructor(opts) {
+	/**
+	 *
+	 * @param server_opts {Object}
+	 * @param opts        {default_options}
+	 */
+	constructor(server_opts,opts) {
 		super();
 
-		this.opts = opts;
+		this.opts = _.merge({},default_options,opts);
+		this.server_opts = server_opts;
 		this.known_sessions = new Map();
 		this.known_sockets = new Map();
 		this.instance = null;
@@ -17,9 +35,11 @@ class http2Server extends EventEmitter {
 	}
 
 	create() {
-		let self = this;
 		this.created = true;
-		this.instance = http2.createSecureServer(this.opts);
+
+		this.instance = this.opts.secure ?
+			http2.createSecureServer(this.server_opts) :
+			http2.createServer(this.server_opts);
 
 		this.instance.on('request',async (req,res) => {
 			if(!this.handle_set) {
@@ -53,24 +73,10 @@ class http2Server extends EventEmitter {
 			};
 
 			session.on('close',async () => {
-				this.emit('session-close',session.pk);
-
-				self.known_sessions.delete(session.pk);
+				this.known_sessions.delete(session.pk);
 			});
 
-			session.on('error',err => {
-				this.emit('session-error',session.pk,err);
-			});
-
-			session.on('timeout',() => {
-				this.emit('session-timeout',session.pk);
-			});
-
-			session.on('connect',(...args) => {
-				this.emit('session-connect',session.pk);
-			});
-
-			this.emit('session-created',session.pk);
+			this.emit('session',session);
 		});
 
 		this.instance.on('connection',socket => {
@@ -78,19 +84,10 @@ class http2Server extends EventEmitter {
 			this.known_sockets.set(socket.pk,socket);
 
 			socket.on('close',() => {
-				this.emit('socket-close',socket.pk);
 				this.known_sockets.delete(socket.pk);
 			});
 
-			socket.on('error',err => {
-				this.emit('socket-error',socket.pk,err);
-			});
-
-			socket.on('timeout',() => {
-				this.emit('socket-timeout',socket.pk);
-			});
-
-			this.emit('socket-created',socket.pk);
+			this.emit('connection',socket);
 		});
 
 		this.instance.on('close',async () => {
@@ -99,6 +96,8 @@ class http2Server extends EventEmitter {
 			if(connections > 0) {
 				await this.closeConnections();
 			}
+
+			this.emit('close');
 		});
 
 		this.instance.on('error',err => {
@@ -135,7 +134,7 @@ class http2Server extends EventEmitter {
 
 	async closeConnections() {
 		await this.closeSessions();
-		await this.closeSockets();
+		this.closeSockets();
 	}
 
 	close() {
@@ -147,6 +146,11 @@ class http2Server extends EventEmitter {
 					resolve();
 			});
 		});
+	}
+
+	async shutdown() {
+		await this.closeConnections();
+		await this.close();
 	}
 
 	listen(...args) {
