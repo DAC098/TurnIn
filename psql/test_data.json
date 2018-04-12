@@ -173,7 +173,17 @@
       "section_id": "(select id from sections where title = 'CSCI 111')",
       "description": "'the third assignment of the class'",
       "points": 100,
-      "options": {}
+      "options": {
+        "exec": [
+          "ls -val",
+          "pwd",
+          "cd /",
+          "ls -val",
+          "cd ~",
+          "ls -val",
+          "cd /app"
+        ]
+      }
     },
     {
       "title": "'fourth assignment'",
@@ -195,6 +205,23 @@
     {
       "image_id": "(select id from images where image_name = 'node:9.10.0')",
       "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'third assignment' and sections.title = 'CSCI 111')"
+    }
+  ],
+  "submissions": [
+    {
+      "users_id": "(select id from users where username = 'student_one')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'third assignment' and sections.title = 'CSCI 111')",
+      "image_id": "(select id from images where image_name = 'node:9.10.0')"
+    },
+    {
+      "users_id": "(select id from users where username = 'student_one')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'third assignment' and sections.title = 'CSCI 111')",
+      "image_id": "(select id from images where image_name = 'node:9.10.0')"
+    },
+    {
+      "users_id": "(select id from users where username = 'student_one')",
+      "assignment_id": "(select assignments.id as id from assignments join sections on assignments.section_id = sections.id where assignments.title = 'third assignment' and sections.title = 'CSCI 111')",
+      "image_id": "(select id from images where image_name = 'node:9.10.0')"
     }
   ]
 }

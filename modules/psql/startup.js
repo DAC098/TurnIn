@@ -58,6 +58,8 @@ const loadTestData = async () => {
 
 		let test_data = JSON.parse(await File.read(process.cwd() + '/psql/test_data.json'));
 
+		log.info('databases with data',Object.keys(test_data));
+
 		for(let test_user of test_data.users) {
 			try {
 				let result = await createUser({'type':'master'},test_user,con);
@@ -89,7 +91,7 @@ const loadTestData = async () => {
 
 		let result = await con.query('select * from images');
 
-		if(result.rows.length < 6) {
+		if(result.rows.length < test_data.images.length) {
 			for(let test_image of test_data.images) {
 				try {
 					let keys = Object.keys(test_image);
@@ -167,6 +169,43 @@ const loadTestData = async () => {
 				let result = await con.query(insert);
 			} catch(err) {
 				log.error(err.stack);
+			}
+		}
+
+		result = await con.query('select * from submissions');
+
+		if(result.rows.length < test_data.submissions.length) {
+			for(let test_submission of test_data.submissions) {
+				try {
+					let keys = Object.keys(test_submission);
+					let values = [];
+
+					for(let k of keys) {
+						if(typeof test_submission[k] === 'object') {
+							values.push(`'${JSON.stringify(test_submission[k])}'`);
+						} else {
+							values.push(test_submission[k]);
+						}
+					}
+
+					let insert = `
+				insert into submissions (${keys.join(',')}) values
+				(${values.join(',')})`;
+
+					let result = await con.query(insert);
+
+					if(result.rows.length === 1) {
+						let dir_path = n_path.join(
+							setup.getKey('directories.data_root'),
+							'submissions',
+							`${result.rows[0].id}`
+						);
+
+						await Dir.make(dir_path);
+					}
+				} catch(err) {
+					log.error(err.stack);
+				}
 			}
 		}
 	} catch(err) {
