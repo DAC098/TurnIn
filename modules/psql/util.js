@@ -2,6 +2,36 @@ const _ = require('lodash');
 
 /**
  *
+ * @param field  {string[]}
+ * @param value  {*}
+ * @param object {Object}
+ * @param count  {number=}
+ */
+const addField = (field,value,object,count = 0) => {
+	// if the field length is only one then assign the value to the key
+	if(field.length === 1) {
+		object[field[0]] = value;
+		return object;
+	}
+
+	// check to make sure that the object will hold the field exists
+	if(!(field[count] in object)) {
+		object[field[count]] = {};
+	}
+
+	// if the next value is the final one then add it
+	if(field.length - 2 === count) {
+		object[field[count]][field[count + 1]] = value;
+		return object;
+	}
+
+	object[field[count]] = addField(field,value,object[field[count]],++count);
+
+	return object;
+};
+
+/**
+ *
  * @typedef {{
  *     array_keys: Array<string>=,
  *     id_field: string=,
@@ -37,9 +67,8 @@ const createObject = (res, options) => {
 		let r_id = '';
 
 		if(Array.isArray(opts.id_field)) {
-			r_id = opts.id_field.map(v => {
-				return r[v];
-			})
+			r_id = opts.id_field
+				.map(v => r[v])
 				.join(':');
 		} else {
 			r_id = r[opts.id_field];
@@ -57,7 +86,6 @@ const createObject = (res, options) => {
 
 				for(let field in r) {
 					let keys = field.split(opts.field_separator);
-					let obj_ref = curr;
 
 					if(opts.array_keys.has(keys[0])) {
 						array_fields.add(field);
@@ -69,20 +97,13 @@ const createObject = (res, options) => {
 							++known_array_fields[keys[0]];
 						}
 
-						if(!(keys[0] in obj_ref))
-							obj_ref[keys[0]] = [];
+						if(!(keys[0] in curr))
+							curr[keys[0]] = [];
 
 						continue;
 					}
 
-					for(let i = 0,l = keys.length - 1; i < l; ++i) {
-						if(!(keys[i] in obj_ref))
-							obj_ref[keys[i]] = {};
-
-						obj_ref = obj_ref[keys[i]];
-					}
-
-					obj_ref[keys[keys.length - 1]] = r[field];
+					curr = addField(keys,r[field],curr);
 				}
 
 				curr_set = true;
@@ -95,31 +116,18 @@ const createObject = (res, options) => {
 		let push = {};
 		let null_count = {};
 
-		for(let field in r) {
-			if(!(array_fields.has(field)))
-				continue;
-
+		for(let field of array_fields) {
 			let keys = field.split(opts.field_separator);
-			let obj_ref = push;
 
-			if(!(keys[0] in obj_ref)) {
-				obj_ref[keys[0]] = {};
+			if(!(keys[0] in push)) {
+				push[keys[0]] = {};
 				null_count[keys[0]] = 0
-			}
-
-			obj_ref = obj_ref[keys[0]];
-
-			for(let i = 1, l = keys.length - 1; i < l; ++i) {
-				if(!(keys[i] in push))
-					obj_ref[keys[i]] = {};
-
-				obj_ref = obj_ref[keys[i]];
 			}
 
 			if(r[field] === null || r[field] === undefined)
 				++null_count[keys[0]];
 
-			obj_ref[keys[keys.length - 1]] = r[field];
+			push = addField(keys,r[field],push);
 		}
 
 		for(let k in push) {
@@ -260,6 +268,16 @@ class QueryBuilder {
 
 		for(let [k,v] of this[inserts_sym]) {
 			rtn.push(this.getValueStr(k));
+		}
+
+		return rtn.join(',');
+	}
+
+	getInsertStr() {
+		let rtn = [];
+
+		for(let [k,v] of this[inserts_sym]) {
+			rtn.push(`${k} = ${this.getValueStr(k)}`);
 		}
 
 		return rtn.join(',');
