@@ -3,6 +3,7 @@ const checkAuthentication = require('modules/security/middleware/checkAuthorizat
 module.exports = [
 	[
 		{
+			name: 'auth-check',
 			path: '/',
 			type: 'mdlwr',
 			methods: ['get','post','put','delete'],
