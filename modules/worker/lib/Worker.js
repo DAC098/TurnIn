@@ -11,6 +11,7 @@ class Worker extends EventEmitter{
 		this.connecting = false;
 		this.client = null;
 		this.attached_listeners = false;
+		this.created = false;
 
 		this.location = {};
 		this.ca = null;
@@ -36,6 +37,8 @@ class Worker extends EventEmitter{
 				'/';
 
 			this.client = http2.connect(url,opts);
+
+			this.created = true;
 
 			this.client.setTimeout(0);
 
@@ -75,6 +78,7 @@ class Worker extends EventEmitter{
 			this.attached_listeners = true;
 
 			this.client.once('close',() => {
+				console.log('worker connection closed');
 				this.connected = false;
 			});
 		}
@@ -138,7 +142,9 @@ class Worker extends EventEmitter{
 	}
 
 	async awaitCon() {
-		if(!this.connected && !this.connecting) {
+		if(!this.created || this.client.destroyed ||
+			(!this.connected && !this.connecting)
+		) {
 			await this.connect();
 		}
 
@@ -149,7 +155,6 @@ class Worker extends EventEmitter{
 
 	async isConnected() {
 		await this.awaitCon();
-
 		return this.connected;
 	}
 
