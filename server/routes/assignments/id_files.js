@@ -77,7 +77,7 @@ module.exports = [
 					let found = false;
 
 					for(let file of req.assignment.files) {
-						if(file === name)
+						if(file.name === name)
 							found = true;
 					}
 

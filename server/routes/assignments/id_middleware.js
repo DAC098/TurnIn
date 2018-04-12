@@ -5,6 +5,7 @@ const getAssignmentData = require('modules/psql/helpers/getAssignmentData');
 module.exports = [
 	[
 		{
+			name: 'assignment-check',
 			path: '/:id([0-9]+)',
 			type: 'mdlwr',
 			methods: ['get','post','put','delete'],
