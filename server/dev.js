@@ -51,7 +51,8 @@ watcher.on('change', p => {
 
 		if(shouldRestart(change_list)) {
 			log.info('file update, closing server');
-			await server.closeAndExit();
+			await server.shutdown();
+			process.exit(0);
 		}
 
 		change_list = [];
