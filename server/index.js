@@ -57,10 +57,13 @@ process.on('beforeExit',async () => {
 	await db_init.startup();
 
 	try {
-		log.info('opening server for connections');
-		await server.listenAsync(443,'0.0.0.0');
+		log.info('creating server');
+		server.create();
 
-		log.info('server listening',server.address());
+		log.info('opening server for connections');
+		await server.listen(443,'0.0.0.0');
+
+		log.info('server listening',server.instance.address());
 	} catch(err) {
 		log.error(err.stack);
 		return;
