@@ -39,10 +39,11 @@ module.exports = [
 					users.username`;
 
 				let result = await con.query(query);
+				let rows = db.util.createObject(result.rows);
 
 				await res.endJSON({
-					'length': result.rows.length,
-					'result': result.rows
+					'length': rows.length,
+					'result': rows
 				});
 			} catch(err) {
 				await res.endError(err);

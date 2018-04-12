@@ -19,27 +19,31 @@ module.exports = [
 				con = await db.connect();
 
 				let body = await parser.json(req);
+				let updates = new db.util.QueryBuilder();
 
-				let update_values = [];
+				if(typeof body.title === 'string') {
+					updates.strField('title',body.title);
+				}
 
-				if(typeof body.title === 'string')
-					update_values.push(`title = '${body.title}'`);
+				if(typeof body.num === 'number') {
+					updates.numField('num',body.num);
+				}
 
-				if(typeof body.num === 'number')
-					update_values.push(`num = ${body.num}`);
+				if(typeof body.year === 'number') {
+					updates.numField('year',body.year);
+				}
 
-				if(typeof body.year === 'number')
-					update_values.push(`year = ${body.year}`);
+				if(typeof body.semester === 'string') {
+					updates.strField('semester',body.semester);
+				}
 
-				if(typeof body.semester === 'string')
-					update_values.push(`semester = ${body.semester}`);
-
-				if(typeof body.teacher_id === 'number')
-					update_values.push(`teacher_id = ${body.teacher_id}`);
+				if(typeof body.teacher_id === 'number') {
+					updates.numField('teacher_id',body.teacher_id);
+				}
 
 				let update_query = `
 				update sections
-				set ${update_values.join(',')}
+				set ${updates.getInsertStr()}
 				where id = ${req.params.id}
 				returning *
 				`;
