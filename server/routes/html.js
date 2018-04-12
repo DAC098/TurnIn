@@ -74,10 +74,12 @@ module.exports = [
 	],
 	[
 		{
-			path: '/html',
+			path: '/',
 			type: 'mdlwr',
 			methods: 'get',
-			regex: /\/.*/
+			options: {
+				end: false
+			}
 		},
 		async (req,res) => {
 			if(typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html')) {

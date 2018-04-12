@@ -6,7 +6,9 @@ module.exports = [
 			path: '/',
 			type: 'mdlwr',
 			methods: ['get','post','put','delete'],
-			regex: /\//
+			options: {
+				end: false
+			}
 		},
 		checkAuthentication
 	]
