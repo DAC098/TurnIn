@@ -1,8 +1,9 @@
 const http = require('http');
 
+const pump = require('../../streaming/asyncPump');
 const parser = require('../../parser');
 
-const start = (exec_id,options = {}) => new Promise((resolve,reject) => {
+const start = (exec_id,options = {},ostream) => new Promise((resolve,reject) => {
 	let req = http.request({
 		method: 'POST',
 		socketPath: '/var/run/docker.sock',
@@ -11,12 +12,32 @@ const start = (exec_id,options = {}) => new Promise((resolve,reject) => {
 			'Content-Type': 'application/json'
 		}
 	},async res => {
-		let body = await parser.text(res);
+		if(res.statusCode === 200) {
+			if(typeof ostream !== 'undefined') {
+				try {
+					await pump(res,ostream);
 
-		resolve({
-			success: res.statusCode === 200,
-			returned: body
-		});
+					resolve({
+						'success': true,
+						'returned': null
+					});
+				} catch(err) {
+					reject(err);
+				}
+			} else {
+				let body = await parser.text(res);
+
+				resolve({
+					success: true,
+					returned: body
+				});
+			}
+		} else {
+			resolve({
+				success: false,
+				returned: await parser.json(res)
+			});
+		}
 	});
 
 	req.on('error',err => {
