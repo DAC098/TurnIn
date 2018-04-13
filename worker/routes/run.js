@@ -1,3 +1,7 @@
+const n_path = require('path');
+const fs = require('fs');
+
+const setup = require('modules/setup');
 const db = require('modules/psql');
 const log = require('modules/log');
 
@@ -5,6 +9,8 @@ const containers = require('modules/docker/containers');
 const exec = require('modules/docker/exec');
 const parser = require('modules/parser');
 const isJsonContent = require('modules/middleware/isJsonContent');
+const Dir = require('modules/fs/Dir');
+const File = require('modules/fs/File');
 
 const getAssignmentData = require('modules/psql/helpers/getAssignmentData');
 const getSubmissionData = require('modules/psql/helpers/getSubmissionData');
@@ -15,6 +21,8 @@ const route_info = {
 	path: '/run',
 	methods: 'post'
 };
+
+let running = new Set();
 
 router.addRoute(route_info,isJsonContent(), async (req,res) => {
 	let con = null;
@@ -28,6 +36,7 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 	let run_request = {};
 	let assignment_info = {};
 	let submission_info = {};
+	let check = req.url_parsed.searchParams.has('check');
 
 	try {
 		con = await db.connect();
@@ -59,9 +68,19 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 			return;
 		}
 
-		await res.endJSON(202,{
-			'message': 'running'
-		});
+		if(running.has(submission_info.id)) {
+			await res.endJSON(202,{
+				'message': 'in-progress'
+			});
+			return;
+		} else {
+			if(!check)
+				running.add(submission_info.id);
+
+			await res.endJSON(202,{
+				'message': check ? 'not-started' : 'started'
+			});
+		}
 	} catch(err) {
 		if(con)
 			con.release();
@@ -71,17 +90,33 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 		return;
 	}
 
-	log.info('assignment',assignment_info);
-
-	log.info('submission',submission_info);
+	if(check)
+		return;
 
 	if(submission_info.image.type !== 'hub') {
 		log.warn('image is not on the hub');
 	}
 
 	let run_container = null;
+	let results_dir = n_path.join(
+		setup.getKey('directories.data_root'),
+		'submissions',
+		`${submission_info.id}`,
+		'results'
+	);
+	let extracts_dir = n_path.join(
+		setup.getKey('directories.data_root'),
+		'submissions',
+		`${submission_info.id}`,
+		'extracts'
+	);
 
-	log.info('creating container');
+	await Dir.make(results_dir);
+	await Dir.make(extracts_dir);
+
+	log.info('creating container',{
+		submission: submission_info.id
+	});
 
 	try {
 		let result = await containers.create(null,{
@@ -94,36 +129,82 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 			OpenStdin: true
 		});
 
-		log.info('container result',result);
-
 		if(result.success) {
 			run_container = result.returned
 		} else {
-			log.warn('unable create container, ending process');
+			running.delete(submission_info.id);
+
+			log.warn('unable create container, ending process',{
+				submission: submission_info.id,
+				data: result.returned
+			});
 			return;
 		}
 	} catch(err) {
-		log.error(err.stack);
+		log.error(`creating container: ${err.stack}`,{
+			submission: submission_info.id
+		});
 	}
 
-	log.info('starting container');
+	log.info('starting container',{
+		submission: submission_info.id,
+		container: run_container.Id
+	});
 
 	try {
 		let result = await containers.start(run_container.Id);
 
-		log.info('starting result',result);
+		if(!result.success) {
+			log.warn('failed to start container',{
+				submission: submission_info.id,
+				container: run_container.Id
+			});
+
+			try {
+				let result = await containers.remove(run_container.Id);
+
+				if(!result.success) {
+					log.warn('failed to remove container',{
+						submission: submission_info.id,
+						container: run_container.Id
+					});
+				}
+			} catch(err) {
+				log.error(`removing container: ${err.stack}`,{
+					submission: submission_info.id,
+					container: run_container.Id
+				});
+			}
+
+			running.delete(submission_info.id);
+
+			return;
+		}
 	} catch(err) {
-		log.error(err.stack);
+		log.error(`starting container: ${err.stack}`,{
+			submission: submission_info.id,
+			container: run_container.Id
+		});
+
+		running.delete(submission_info.id);
+
+		return;
 	}
 
-	log.info('running executions');
+	let results_json_path = n_path.join(results_dir,'data.json');
+	let results_json = await File.exists(results_json_path) ?
+		JSON.parse(await File.read(results_json_path)) :
+		{runs:[]};
+
+	log.info('running executions',{
+		submission: submission_info.id,
+		container: run_container.Id
+	});
+
+	let output_files = [];
 
 	for(let cmd of assignment_info.options.exec) {
-		log.info(`executing: "/bin/sh -c ${cmd}"`);
-
 		let exec_instance = null;
-
-		log.info('creating execute instance');
 
 		try {
 			let result = await exec.make(run_container.Id,{
@@ -132,48 +213,179 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 				Cmd: ['/bin/sh','-c',cmd]
 			});
 
-			log.info('exec create result',result);
-
 			if(result.success) {
 				exec_instance = result.returned
 			} else {
-				log.warn('failed to create exec instance');
+				log.warn('failed to create exec instance',{
+					submission: submission_info.id,
+					container: run_container.Id,
+					cmd,
+					data: result.returned
+				});
 				continue;
 			}
 		} catch(err) {
-			log.error(err.stack);
-		}
+			log.error(`creating command: ${err.stack}`,{
+				submission: submission_info.id,
+				container: run_container.Id,
+				cmd
+			});
 
-		log.info('executing command');
+			output_files.push({
+				cmd,
+				error: err.stack
+			});
+
+			continue;
+		}
 
 		try {
 			let result = await exec.start(exec_instance.Id);
 
-			log.info('exec start result',result);
+			if(result.success) {
+				output_files.push({
+					output: result.returned,
+					cmd
+				});
+			} else {
+				output_files.push({
+					cmd,
+					returned: result.returned
+				});
+				log.warn('there was a problem running the command',{
+					submission: submission_info.id,
+					container: run_container.Id,
+					cmd,
+					data: result.returned
+				});
+			}
 		} catch(err) {
-			log.error(err.stack);
+			log.error(`running command: ${err.stack}`,{
+				submission: submission_info.id,
+				container: run_container.Id,
+				cmd
+			});
+
+			output_files.push({
+				cmd,
+				error: err.stack
+			});
 		}
 	}
 
-	log.info('stopping container');
+	results_json.runs.push({
+		container: run_container,
+		results: output_files
+	});
+
+	await File.write(results_json_path,JSON.stringify(results_json));
+
+	log.info('stopping container',{
+		submission: submission_info.id,
+		container: run_container.Id
+	});
 
 	try {
 		let result = await containers.stop(run_container.Id);
 
-		log.info('stopping result',result);
+		if(!result.success) {
+			log.warn('failed to stop container',{
+				submission: submission_info.id,
+				container: run_container.Id
+			});
+		}
 	} catch(err) {
-		log.error(err.stack);
+		log.error(`stopping container: ${err.stack}`,{
+			submission: submission_info.id,
+			container: run_container.Id
+		});
 	}
 
-	log.info('extracting data');
+	let extract_json_path = n_path.join(extracts_dir,'data.json');
+	let extract_json = await File.exists(extract_json_path) ?
+		JSON.parse(await File.read(extract_json_path)) :
+		{runs:[]};
 
-	log.info('destroying container');
+	if(assignment_info.options.extract.length !== 0) {
+		log.info('extracting data',{
+			submission: submission_info.id,
+			container: run_container.Id
+		});
+
+		let count = 0;
+		let extract_files = [];
+
+		for(let path of assignment_info.options.extract) {
+			try {
+				let extract_name = `${run_container.Id}_${++count}.tar`;
+				let extract_path = n_path.join(extracts_dir,extract_name);
+				let result = await containers.archive.toPath(run_container.Id,path,extract_path);
+
+				if(result.success) {
+					extract_files.push({
+						path,
+						filename: extract_name
+					});
+				} else {
+					log.warn('failed to extract data from container',{
+						submission: submission_info.id,
+						container: run_container.Id,
+						path,
+						data: result.returned
+					});
+
+					extract_files.push({
+						path,
+						returned: result.returned
+					});
+				}
+			} catch(err) {
+				log.error(`extract data: ${err.stack}`,{
+					submission: submission_info.id,
+					container: run_container.Id,
+					path
+				});
+
+				extract_files.push({
+					path,
+					error: err.stack
+				});
+			}
+		}
+
+		extract_json.runs.push({
+			container: run_container,
+			results: extract_files
+		});
+	} else {
+		extract_json.runs.push({
+			container: run_container,
+			results: []
+		});
+	}
+
+	await File.write(extract_json_path,JSON.stringify(extract_json));
+
+	log.info('removing container',{
+		submission: submission_info.id,
+		container: run_container.Id
+	});
 
 	try {
 		let result = await containers.remove(run_container.Id);
 
-		log.info('removal result',result);
+		if(!result.success) {
+			log.warn('failed to remove container',{
+				submission: submission_info.id,
+				container: run_container.Id
+			});
+		}
 	} catch(err) {
-		log.error(err.stack);
+		log.error(`remove container: ${err.stack}`,{
+			submission: submission_info.id,
+			container: run_container.Id
+		});
 	}
+
+	running.delete(submission_info.id);
 });
