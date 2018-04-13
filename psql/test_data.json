@@ -182,6 +182,9 @@
           "cd ~",
           "ls -val",
           "cd /app"
+        ],
+        "extract": [
+          "/etc"
         ]
       }
     },
