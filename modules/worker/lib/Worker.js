@@ -78,7 +78,6 @@ class Worker extends EventEmitter{
 			this.attached_listeners = true;
 
 			this.client.once('close',() => {
-				console.log('worker connection closed');
 				this.connected = false;
 			});
 		}
@@ -171,18 +170,28 @@ class Worker extends EventEmitter{
 	 *
 	 * @param assignment_id {number}
 	 * @param submission_id {number}
-	 * @returns {Promise<boolean>}
+	 * @param check         {boolean=}
+	 * @returns {Promise<{
+	 *     success: boolean,
+	 *     message: string
+	 * }>}
 	 */
-	async run(assignment_id,submission_id) {
+	async run(assignment_id,submission_id,check = false) {
 		if(!await this.isConnected())
-			return false;
+			return {
+				success: false,
+				message: 'no connection'
+			};
 
-		let rtn = await this.req('post','/run',{
+		let rtn = await this.req('post',`/run${check ? '?check=1' : ''}`,{
 			assignment_id,
 			submission_id
 		});
 
-		return rtn.headers[':status'] === 202;
+		return {
+			success: rtn.headers[':status'] === 202,
+			message: rtn.body['message']
+		};
 	}
 
 	async updateFiles(opts) {
