@@ -8,10 +8,15 @@ module.exports = [
 			methods: 'post'
 		},
 		async (req,res) => {
-			let result = await wkr.run(req.submission.assignment_id,req.submission.id);
+			let result = await wkr.run(
+				req.submission.assignment_id,
+				req.submission.id,
+				req.url_parsed.searchParams.has('check')
+			);
 
 			await res.endJSON({
-				'message': 'running ? ' + result
+				'success': result.success,
+				'message': result.message
 			});
 		}
 	]
