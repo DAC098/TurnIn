@@ -131,3 +131,5 @@ const processCliArgs = async () => {
 setup['processCliArgs'] = processCliArgs;
 
 module.exports = setup;
+
+setup['helpers'] = require('./helpers');
