@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 
 const parser = require('../../parser');
+const pump = require('../../streaming/asyncPump');
 
 /**
  *
@@ -10,11 +11,13 @@ const parser = require('../../parser');
  *     dockerfile: string,
  *     labels: Object<string,string>,
  *     t: Array<string>|string,
- *     remote: string
+ *     remote: string,
+ *     rm: boolean=,
+ *     no_cache: boolean=
  * }=}
  * @returns {Promise<any>}
  */
-const build = async (dockerfile_path,options = {}) => new Promise((resolve,reject) => {
+const build = (dockerfile_path,options = {}) => new Promise(async (resolve,reject) => {
 	let query = [];
 	let dockerfile_read = fs.createReadStream(dockerfile_path);
 
@@ -36,26 +39,34 @@ const build = async (dockerfile_path,options = {}) => new Promise((resolve,rejec
 		}
 	}
 
+	if(typeof options.rm === 'boolean') {
+		query.push(`rm=${options.rm}`);
+	}
+
+	if(typeof options.no_cache === 'boolean') {
+		query.push(`nocache=${options.no_cache}`);
+	}
+
 	let req = http.request({
 		method: 'POST',
 		socketPath: '/var/run/docker.sock',
-		path: `/build${query.length !== 0 ? query.join('&') : ''}`,
+		path: `/build${query.length !== 0 ? '?' + query.join('&') : ''}`,
 		headers: {
 			'Content-Type': 'application/x-tar'
 		}
 	},async res => {
-		let body = null;
-
-		if('content-type' in res.headers && res.headers['content-type'] === 'application/json') {
-			body = await parser.json(res);
-		}
-
 		if(res.statusCode === 200) {
 			resolve({
 				'success': true,
 				'returned': res
 			});
 		} else {
+			let body = null;
+
+			if('content-type' in res.headers && res.headers['content-type'] === 'application/json') {
+				body = await parser.json(res);
+			}
+
 			resolve({
 				'success': false,
 				'returned': body
@@ -67,7 +78,7 @@ const build = async (dockerfile_path,options = {}) => new Promise((resolve,rejec
 		reject(err);
 	});
 
-	dockerfile_read.pipe(req);
+	await pump(dockerfile_read,req);
 });
 
 module.exports = build;

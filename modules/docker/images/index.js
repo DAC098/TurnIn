@@ -1,5 +1,6 @@
 const exp = {
-	build: require('./build')
+	build: require('./build'),
+	list: require('./list')
 };
 
 module.exports = exp;
