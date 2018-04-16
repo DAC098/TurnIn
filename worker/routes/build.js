@@ -94,6 +94,60 @@ router.addRoute({
 		`${image_info.id}`
 	);
 
+	log.info('checking for image',{
+		image_id: image_info.id
+	});
+
+	try {
+		let result = await images.list(null,{
+			label: [
+				'com.turnin=true',
+				`com.turnin.image_id=${image_info.id}`
+			]
+		});
+
+		if(result.success) {
+			if(image_info.docker_id !== null) {
+				let found = false;
+
+				for(let image of result.returned) {
+					if(image.Id === image_info.docker_id) {
+						build_image = image;
+					}
+				}
+
+				if(!found) {
+					log.warn('unable to locate image in docker instance',{
+						image_id: image_info.id
+					});
+				}
+			} else {
+				log.info('no docker id stored',{
+					image_id: image_info.id
+				});
+			}
+		} else {
+			log.warn('unable to retrieve current list of images',{
+				image_id: image_info.id,
+				data: result.returned
+			});
+		}
+	} catch(err) {
+		log.error(`checking for image: ${err.stack}`,{
+			image_id: image_info.id
+		});
+	}
+
+	if(build_image.Containers >= 1) {
+		log.warn('containers are currently using this image',{
+			image_id: image_info.id
+		});
+	} else {
+		log.info('no containers are using this image',{
+			image_id: image_info.id
+		});
+	}
+
 	log.info('building image',{
 		image_id: image_info.id
 	});
@@ -112,7 +166,8 @@ router.addRoute({
 				'com.turnin': 'true',
 				'com.turnin.image_id': `${image_info.id}`
 			},
-			no_cache: true
+			no_cache: true,
+			t: [`turnin_${image_info.id}:latest`]
 		});
 		let output = fs.createWriteStream(output_file);
 
@@ -161,7 +216,9 @@ router.addRoute({
 	}
 
 	if(wait_on !== null) {
-		log.info('waiting on build');
+		log.info('waiting on build',{
+			image_id: image_info.id
+		});
 
 		try {
 			await wait_on;
@@ -190,9 +247,13 @@ router.addRoute({
 			con.release();
 
 			if(result.rows.length === 1) {
-				log.info('successfully built image')
+				log.info('successfully built image',{
+					image_id: image_info.id
+				})
 			} else {
-				log.warn('failed to update db with image id');
+				log.warn('failed to update db with image id',{
+					image_id: image_info.id
+				});
 			}
 		} catch(err) {
 			if(con)
