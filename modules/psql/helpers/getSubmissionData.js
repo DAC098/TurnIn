@@ -47,6 +47,7 @@ const getSubmissionData = async (id,con) => {
 		images.options as image__options,
 		images.image_type as image__type,
 		images.image_status as image__status,
+		images.docker_id as image__docker_id,
 		submitted_files.filename as files__name
 	from submissions
 	left join submitted_files on
