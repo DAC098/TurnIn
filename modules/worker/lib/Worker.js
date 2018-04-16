@@ -194,6 +194,32 @@ class Worker extends EventEmitter{
 		};
 	}
 
+	/**
+	 *
+	 * @param image_id {number}
+	 * @param check    {boolean}
+	 * @returns {Promise<{
+	 *     success: boolean
+	 *     message: string
+	 * }>}
+	 */
+	async build(image_id,check = false) {
+		if(!await this.isConnected())
+			return {
+				success: false,
+				message: 'no connection'
+			};
+
+		let rtn = await this.req('post',`/build${check ? '?check=1': ''}`, {
+			image_id
+		});
+
+		return {
+			success: rtn.headers[':status'] === 202,
+			message: rtn.body['message']
+		};
+	}
+
 	async updateFiles(opts) {
 		if(!await this.isConnected())
 			return false;
