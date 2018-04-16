@@ -84,7 +84,12 @@ module.exports = [
 		},
 		async (req,res) => {
 			try {
-				let dockerfile_path = n_path.join(setup.getKey('directories.data_root'),'images',req.image.id,'Dockerfile');
+				let dockerfile_path = n_path.join(
+					setup.getKey('directories.data_root'),
+					'images',
+					`${req.image.id}`,
+					'Dockerfile.tar'
+				);
 
 				if(await File.exists(dockerfile_path)) {
 					let dockerfile_read = fs.createReadStream(dockerfile_path);
@@ -116,7 +121,12 @@ module.exports = [
 
 				await con.beginTrans();
 
-				let dockerfile_path = n_path.join(setup.getKey('directories.data_root'),'images',req.params.id,'Dockerfile');
+				let dockerfile_path = n_path.join(
+					setup.getKey('directories.data_root'),
+					'images',
+					`${req.params.id}`,
+					'Dockerfile.tar'
+				);
 
 				if(!await Dir.exists(n_path.dirname(dockerfile_path)))
 					await Dir.make(n_path.dirname(dockerfile_path));

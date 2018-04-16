@@ -1,4 +1,5 @@
 const db = require('modules/psql');
+const wkr = require('modules/worker');
 const listImages = require('modules/psql/helpers/images/listImages');
 
 module.exports = [
@@ -30,11 +31,13 @@ module.exports = [
 
 					if(image.is_owner) {
 						// begin to build the file
-						await res.endJSON({});
+						let response = await wkr.build(image.id);
+						await res.endJSON(response);
 					} else {
 						if(req.user.type === 'master' || req.user.permission.images.modify) {
 							// begin to build the file
-							await res.endJSON({});
+							let response = await wkr.build(image.id);
+							await res.endJSON(response);
 						} else {
 							await res.endJSON(401,{
 								'message': 'you do not have permission to build this image'
