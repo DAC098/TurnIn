@@ -22,7 +22,7 @@ const route_info = {
 	methods: 'post'
 };
 
-let running = new Set();
+let in_progress = new Set();
 
 router.addRoute(route_info,isJsonContent(), async (req,res) => {
 	let con = null;
@@ -68,14 +68,14 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 			return;
 		}
 
-		if(running.has(submission_info.id)) {
+		if(in_progress.has(submission_info.id)) {
 			await res.endJSON(202,{
 				'message': 'in-progress'
 			});
 			return;
 		} else {
 			if(!check)
-				running.add(submission_info.id);
+				in_progress.add(submission_info.id);
 
 			await res.endJSON(202,{
 				'message': check ? 'not-started' : 'started'
@@ -99,15 +99,11 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 
 	let run_container = null;
 	let results_dir = n_path.join(
-		setup.getKey('directories.data_root'),
-		'submissions',
-		`${submission_info.id}`,
+		setup.helpers.getSubmissionDir(submission_info.id),
 		'results'
 	);
 	let extracts_dir = n_path.join(
-		setup.getKey('directories.data_root'),
-		'submissions',
-		`${submission_info.id}`,
+		setup.helpers.getSubmissionDir(submission_info.id),
 		'extracts'
 	);
 
@@ -132,7 +128,7 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 		if(result.success) {
 			run_container = result.returned
 		} else {
-			running.delete(submission_info.id);
+			in_progress.delete(submission_info.id);
 
 			log.warn('unable create container, ending process',{
 				submission: submission_info.id,
@@ -176,7 +172,7 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 				});
 			}
 
-			running.delete(submission_info.id);
+			in_progress.delete(submission_info.id);
 
 			return;
 		}
@@ -186,7 +182,7 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 			container: run_container.Id
 		});
 
-		running.delete(submission_info.id);
+		in_progress.delete(submission_info.id);
 
 		return;
 	}
@@ -387,5 +383,5 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 		});
 	}
 
-	running.delete(submission_info.id);
+	in_progress.delete(submission_info.id);
 });
