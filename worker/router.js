@@ -7,3 +7,4 @@ module.exports = router;
 require('./routes/run');
 require('./routes/test');
 require('./routes/close');
+require('./routes/build');
