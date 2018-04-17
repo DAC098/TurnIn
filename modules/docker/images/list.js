@@ -16,7 +16,7 @@ const list = (all,filters) => new Promise((resolve,reject) => {
 	let req = http.request({
 		method: 'GET',
 		socketPath: '/var/run/docker.sock',
-		path: `/images/json${query.length > 0 ? query.join('&') : ''}`
+		path: `/images/json${query.length > 0 ? `?${query.join('&')}` : ''}`
 	},async res => {
 		let body = await parser.json(res);
 
