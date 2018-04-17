@@ -26,7 +26,8 @@ const db = require('../index');
  *         name: string,
  *         options: Object,
  *         type: string,
- *         status: string
+ *         status: string,
+ *         docker_id: string|null
  *     },
  *     files: {
  *         name: string
