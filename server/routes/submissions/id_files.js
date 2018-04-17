@@ -99,7 +99,7 @@ module.exports = [
 					await con.beginTrans();
 
 					let query = `
-					insert into submission_files values('${name}',${req.submission.id})
+					insert into submitted_files values('${name}',${req.submission.id})
 					returning *`;
 
 					let result = await con.query(query);
