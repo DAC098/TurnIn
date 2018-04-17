@@ -1,5 +1,6 @@
 const n_path = require('path');
-const fs = require('fs');
+
+const tar = require('tar');
 
 const setup = require('modules/setup');
 const db = require('modules/psql');
@@ -98,32 +99,113 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 	}
 
 	let run_container = null;
+	let mount_files = false;
+	let mount_dir = '';
+	let submission_dir = setup.helpers.getSubmissionDir(submission_info.id);
 	let results_dir = n_path.join(
-		setup.helpers.getSubmissionDir(submission_info.id),
+		submission_dir,
 		'results'
 	);
 	let extracts_dir = n_path.join(
-		setup.helpers.getSubmissionDir(submission_info.id),
+		submission_dir,
 		'extracts'
 	);
 
 	await Dir.make(results_dir);
 	await Dir.make(extracts_dir);
 
+	if(submission_info.files.length > 0) {
+		mount_files = true;
+
+		mount_dir = n_path.join(
+			submission_dir,
+			'__mount'
+		);
+	}
+
+	if(mount_files) {
+		try {
+			log.info('cleaning mount',{
+				submission: submission_info.id
+			});
+
+			if(await Dir.exists(mount_dir))
+				await Dir.remove(mount_dir,true);
+
+			await Dir.make(mount_dir);
+		} catch(err) {
+			log.error(`cleaning mount: ${err.stack}`,{
+				submission: submission_info.id
+			});
+
+			mount_files = false;
+		}
+	}
+
+	if(mount_files) {
+		try {
+			log.info('mounting submission files',{
+				submission: submission_info.id
+			});
+
+			for(let file of submission_info.files) {
+				if(n_path.extname(file.name) === '.tar') {
+					await tar.extract({
+						cwd: mount_dir,
+						file: n_path.join(submission_dir,file.name)
+					});
+				} else {
+					await File.copy(
+						n_path.join(submission_dir,file.name),
+						n_path.join(mount_dir,file.name)
+					);
+				}
+			}
+		} catch(err) {
+			log.error(`mounting submission files: ${err.stack}`,{
+				submission: submission_info.id
+			});
+
+			mount_files = false;
+		}
+	}
+
 	log.info('creating container',{
 		submission: submission_info.id
 	});
 
 	try {
-		let result = await containers.create(null,{
-			Image: submission_info.image.name,
+		let container_options = {
+			Image: submission_info.image.type === 'custom' ?
+				submission_info.image.docker_id :
+				submission_info.image.name,
 			Cmd: ['/bin/bash'],
+			WorkingDir: '/app',
 			Tty: false,
 			AttachStdin: true,
 			AttachStdout: true,
 			AttachStderr: true,
 			OpenStdin: true
-		});
+		};
+
+		if(mount_files) {
+			container_options['HostConfig'] = {
+				Mounts: [
+					{
+						Target: '/app',
+						Source: n_path.join(
+							setup.getKey('docker.host_mount'),
+							'submissions',
+							`${submission_info.id}`,
+							'__mount'
+						),
+						Type: 'bind'
+					}
+				]
+			}
+		}
+
+		let result = await containers.create(null,container_options);
 
 		if(result.success) {
 			run_container = result.returned
@@ -380,6 +462,20 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 		log.error(`remove container: ${err.stack}`,{
 			submission: submission_info.id,
 			container: run_container.Id
+		});
+	}
+
+	try {
+		if(mount_files) {
+			log.info('cleaning mount',{
+				submission: submission_info.id
+			});
+
+			await Dir.remove(mount_dir,true);
+		}
+	} catch(err) {
+		log.error(`cleaning mount: ${err.stack}`,{
+			submission: submission_info.id
 		});
 	}
 
