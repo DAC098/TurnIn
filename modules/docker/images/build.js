@@ -25,8 +25,8 @@ const build = (dockerfile_path,options = {}) => new Promise(async (resolve,rejec
 		query.push(`dockerfile=${options.dockerfile}`);
 	}
 
-	if(options.labels) {
-		query.join(`labels=${JSON.stringify(options.labels)}`);
+	if(typeof options.labels === 'object') {
+		query.push(`labels=${JSON.stringify(options.labels)}`);
 	}
 
 	if(options.t) {
