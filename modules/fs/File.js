@@ -2,6 +2,7 @@ const nFS = require('fs');
 const nPath = require('path');
 const nUtil = require('util');
 const jsYaml = require('js-yaml');
+const pump = require('pump');
 
 const nLStat = nUtil.promisify(nFS.lstat);
 
@@ -152,6 +153,26 @@ class File {
 	static loadYamlSync(path) {
 		let data = File.readSync(path);
 		return jsYaml.safeLoad(data);
+	}
+
+	/**
+	 *
+	 * @param current_path {string}
+	 * @param new_path     {string}
+	 * @returns {Promise<void>}
+	 */
+	static copy(current_path, new_path) {
+		return new Promise((resolve,reject) => {
+			let read_stream = nFS.createReadStream(current_path);
+			let write_stream = nFS.createWriteStream(new_path);
+
+			pump(read_stream,write_stream,err => {
+				if(err)
+					reject(err);
+				else
+					resolve();
+			});
+		});
 	}
 }
 
