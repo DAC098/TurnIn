@@ -1,5 +1,15 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 
-export default function App(props) {
-	return <div>App</div>;
-}
+// import socket from '../socket';
+
+import renderEntry from '../renderEntry';
+
+import Body from '../components/Body';
+import Header from '../components/Header';
+
+const App = () => <Fragment>
+	<Header/>
+	<Body>App</Body>
+</Fragment>;
+
+renderEntry(App);
