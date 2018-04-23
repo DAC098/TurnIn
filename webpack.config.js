@@ -22,6 +22,7 @@ module.exports = async (...args) => {
 	});
 
 	return {
+		mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 		entry: {
 			app: path.join(__dirname, './view/entry/App.jsx'),
 			login: path.join(__dirname, './view/entry/Login.jsx')
@@ -33,7 +34,7 @@ module.exports = async (...args) => {
 			chunkFilename: '[name].js'
 		},
 		module: {
-			loaders: [
+			rules: [
 				{
 					test: /\.jsx$/,
 					loader: 'babel-loader',
@@ -47,28 +48,31 @@ module.exports = async (...args) => {
 		resolve: {
 			extensions: ['.js', '.jsx', '.json']
 		},
+		devtool: 'source-map',
+		optimization: {
+			splitChunks: {
+				cacheGroups: {
+					vendor: {
+						name: 'vendor',
+						test: /[\\/]node_modules[\\/]/,
+						chunks: 'all'
+					},
+					common: {
+						name: 'common',
+						chunks: 'initial',
+						minChunks: 2
+					}
+				}
+			},
+			runtimeChunk: true
+		},
 		plugins: [
 			new webpack.DefinePlugin(env_vars),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: 'vendor',
-				minChunks: (module, count) => {
-					let context = module.context;
-					return context && context.indexOf('node_modules') >= 0;
-				}
-			}),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: 'common',
-				minChunks: 2
-			}),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: 'init',
-				minChunks: Infinity
-			}),
-			new webpack.SourceMapDevToolPlugin({
-				filename: '[file].map',
-				exclude: ['vendor', 'init'],
-				publicPath: '/assets/scripts/'
-			}),
+			// new webpack.SourceMapDevToolPlugin({
+			// 	filename: '[file].map',
+			// 	exclude: ['vendor', 'init'],
+			// 	publicPath: '/assets/scripts/'
+			// }),
 			process.env.NODE_ENV === 'production' ? new BabiliPlugin() : () => {
 			},
 			new ManifestPlugin({
