@@ -29,7 +29,7 @@ const app_string = `
 <html lang="en">
 	<head>
 	${head_string}
-	<script type="application/javascript" src="/assets/scripts/init.js"></script>
+	<script type="application/javascript" src="/assets/scripts/runtime~app.js"></script>
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'scripts/common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
 	${is_dev && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
@@ -47,7 +47,7 @@ const login_string = `
 <html lang="en">
 	<head>
 	${head_string}
-	<script type="application/javascript" src="/assets/scripts/init.js"></script>
+	<script type="application/javascript" src="/assets/scripts/runtime~login.js"></script>
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'scripts/common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
 	${is_dev && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
