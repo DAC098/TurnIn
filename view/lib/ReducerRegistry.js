@@ -31,6 +31,9 @@ export default class ReducerRegistry {
 				reducers[key] = (state = null) => state;
 		}
 
+		if(reducer_names.length === 0)
+			reducers['emtpy'] = (state = null) => state;
+
 		return combineReducers(reducers);
 	}
 }

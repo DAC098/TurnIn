@@ -4,6 +4,7 @@ export const SET_THEME = 'app/theme/set_theme';
 
 export const THEMES = {
 	'dark': {
+		style: 'dark',
 		status_bar: '#000000',
 		app_bar: '#212121',
 		background: '#303030',
@@ -19,6 +20,7 @@ export const THEMES = {
 		}
 	},
 	'light': {
+		style: 'light',
 		status_bar: '#e0e0e0',
 		app_bar: '#f5f5f5',
 		background: '#fafafa',

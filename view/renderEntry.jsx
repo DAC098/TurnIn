@@ -11,6 +11,7 @@ import reducer_registry from './reducer_registry';
 import store from './store';
 
 import ThemeProvider from './containers/ThemeProvider';
+import CatchError from './containers/CatchError';
 
 reducer_registry.addReducer('theme',themeReducer);
 
@@ -20,11 +21,13 @@ const renderEntry = (Component) => {
 
 		render(
 			<Provider store={store}>
-				<Router>
-					<ThemeProvider>
-						<Component/>
-					</ThemeProvider>
-				</Router>
+				<CatchError>
+					<Router>
+						<ThemeProvider>
+							<Component/>
+						</ThemeProvider>
+					</Router>
+				</CatchError>
 			</Provider>,
 			ren_tar,
 			() => {
