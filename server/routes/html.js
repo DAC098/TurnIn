@@ -35,7 +35,7 @@ const head_string = `
 </script>
 `;
 
-const app_string = `
+const getAppHTML = () => `
 <!DOCTYPE html> 
 <html lang="en">
 	<head>
@@ -54,7 +54,7 @@ const app_string = `
 </html>
 `;
 
-const login_string = `
+const getLoginHTML = () => `
 <!DOCTYPE html> 
 <html lang="en">
 	<head>
@@ -123,7 +123,7 @@ module.exports = [
 		},
 		async (req,res) => {
 			res.writeHead(200,{'content-type':'text/html'});
-			res.end(login_string);
+			res.end(getLoginHTML());
 		}
 	],
 	[
@@ -138,7 +138,7 @@ module.exports = [
 		async (req,res) => {
 			if(typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html')) {
 				res.writeHead(200,{'content-type':'text/html'});
-				await res.endAsync(app_string);
+				await res.endAsync(getAppHTML());
 
 				return false;
 			}
