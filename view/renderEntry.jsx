@@ -5,8 +5,10 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import {Provider} from 'react-redux';
 
 import themeReducer from './reducers/theme';
+import systemReducer from './reducers/system';
 
 import reducer_registry from './reducer_registry';
+import req from './lib/request';
 
 import store from './store';
 
@@ -14,8 +16,11 @@ import ThemeProvider from './containers/ThemeProvider';
 import CatchError from './containers/CatchError';
 
 reducer_registry.addReducer('theme',themeReducer);
+reducer_registry.addReducer('system',systemReducer);
 
-const renderEntry = (Component) => {
+req.setUser('master','password');
+
+const renderEntry = (Comp) => {
 	document.addEventListener('DOMContentLoaded',() => {
 		const ren_tar = document.getElementById('ren-tar');
 
@@ -24,7 +29,7 @@ const renderEntry = (Component) => {
 				<CatchError>
 					<Router>
 						<ThemeProvider>
-							<Component/>
+							<Comp/>
 						</ThemeProvider>
 					</Router>
 				</CatchError>
