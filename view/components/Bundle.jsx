@@ -47,12 +47,7 @@ export default class Bundle extends Component {
 }
 
 export function lazyLoad(req,loading) {
-	let load_comp = loading || (() => {
-		console.log('rendering load comp');
-		return <div>...loading</div>;
-	});
-
-	console.log('returning bundle',req,load_comp);
+	let load_comp = loading || (() => <div>...loading</div>);
 
 	return props => <Bundle
 			load={req}
