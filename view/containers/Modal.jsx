@@ -9,12 +9,20 @@ document.addEventListener('DOMContentLoaded',() => {
 	document.body.appendChild(container);
 });
 
+const ModalStyle = styled.div`
+	z-index: 500;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	top: 50%;
+	left: 50%;
+`;
+
 /**
  * creates a modal in the DOM using React Portals in order to render the
  * element in a different location but keep in the render process of the
  * element requesting it
  */
-class ModalBase extends React.Component {
+class Modal extends React.Component {
 	constructor(props) {
 		super(props);
 		this.container = container;
@@ -23,22 +31,19 @@ class ModalBase extends React.Component {
 
 	render() {
 		return createPortal(
-			<div className={this.props.className}>
+			<ModalStyle>
 				<Card depth={this.props.depth}>
 					{this.props.children}
 				</Card>
-			</div>,
+			</ModalStyle>,
 			this.container
 		);
 	}
 }
 
-const Modal = styled(ModalBase)`
-	z-index: 500;
-	position: absolute;
-	transform: translate(-50%,-50%);
-	top: 50%;
-	left: 50%;
-`;
+Modal.defaultProps = {
+	onClose: () => {},
+	timer: false
+};
 
 export default Modal;
