@@ -6,8 +6,33 @@ import React  from 'react';
 import {Motion,spring}  from 'react-motion';
 
 import {IconButton} from './Buttons';
+import Icon from './Icon';
 
-class SideMenuBase extends React.Component {
+const SideMenuStyle = styled.section`
+	position: fixed;
+	top: 0;
+	z-index: 50;
+	${props => `${props.position}: 0`};
+	
+	& > div:first-child {
+		background-color: ${props => props.theme.cards};
+		height: 100vh;
+		width: 240px;
+		position: absolute;
+		top: 0;
+		z-index: 1;
+	}
+	
+	& > div:last-child {
+		position: absolute;
+		top: 0;
+		background-color: rgba(${hexColorToDecimal(colors.black)},0.5);
+		width: 100vw;
+		height: 100vh;
+	}
+`;
+
+class SideMenu extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -35,15 +60,15 @@ class SideMenuBase extends React.Component {
 	getContents(style) {
 		let mod_style = this.state.visible ? null : {'display': 'none'};
 
-		return <section
+		return <SideMenuStyle
 			style={this.state.animating ? null : mod_style}
-			className={this.props.className}
+			position={this.props.position}
 		>
 			<div style={this.state.animating ? {transform: `translateX(${style.left}%)`,[this.props.position]: 0} : {[this.props.position]: 0}}>
 				<IconButton style={{position: 'absolute',top: 0,right: 0}} onClick={() => {
 					this.props.onClose();
 				}}>
-					close
+					<Icon>close</Icon>
 				</IconButton>
 				{this.props.children}
 			</div>
@@ -51,7 +76,7 @@ class SideMenuBase extends React.Component {
 				style={this.state.animating ? {transform: `translateX(${style.left}%)`,[this.props.position]: 0} : {[this.props.position]: 0}}
 				onClick={() => this.props.onClose()}
 			/>
-		</section>
+		</SideMenuStyle>
 	}
 
 	render() {
@@ -72,35 +97,11 @@ class SideMenuBase extends React.Component {
 	}
 }
 
-SideMenuBase.defaultProps = {
+SideMenu.defaultProps = {
 	onClose: () => {
 		console.log('SideMenu: no onClose prop given');
-	}
+	},
+	position: 'left'
 };
-
-const SideMenu = styled(SideMenuBase)`
-	position: fixed;
-	top: 0;
-	z-index: 50;
-	
-	& > div:first-child {
-		background-color: ${colors.white};
-		height: 100vh;
-		width: 240px;
-		position: absolute;
-		top: 0;
-		z-index: 1;
-	}
-	
-	& > div:last-child {
-		position: absolute;
-		top: 0;
-		background-color: rgba(${props => hexColorToDecimal(props.theme.cards)},0.5);
-		width: 100vw;
-		height: 100vh;
-	}
-	
-	${props => `${props.position}: 0`};
-`;
 
 export default SideMenu;
