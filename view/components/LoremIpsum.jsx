@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 
 const LoremIpsum = (props) => <div style={{
-	width: 50 + 'em',
+	maxWidth: 50 + 'em',
 	marginLeft: 'auto',
 	marginRight: 'auto'
 }}>
