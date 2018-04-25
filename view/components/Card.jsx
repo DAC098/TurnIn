@@ -36,7 +36,7 @@ export function getCardShadow(depth = 1) {
 export const Card = styled.div`
 	${props => getCardShadow(props.depth)}
 	position: relative;
-	background-color: ${colors.white};
+	background-color: ${props => props.theme.cards};
 	box-sizing: border-box;
 	padding: 8px;
 	margin: 8px;
