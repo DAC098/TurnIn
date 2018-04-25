@@ -10,8 +10,10 @@ const initial_state = {
 const themeReducer = (state = initial_state,action) => {
 	switch(action.type) {
 		case SET_THEME:
-			return {...state,style: action.style};
-			break;
+			return {
+				...state,
+				style: action.style
+			};
 		default:
 			return state;
 	}
