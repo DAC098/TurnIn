@@ -6,6 +6,7 @@ const db = require('modules/psql');
 const setup = require('modules/setup');
 const log = require('modules/log');
 const Dir = require('modules/fs/Dir');
+const File = require('modules/fs/File');
 const variables = require('modules/variables');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
@@ -66,7 +67,8 @@ module.exports = [
 				 *         mount_point: string=,
 				 *         working_dir: string=,
 				 *         exec: string[]=
-				 *     }=
+				 *     }=,
+				 *     tests: string=
 				 * }}
 				 */
 				let body = await parser.json(req);
@@ -126,12 +128,29 @@ module.exports = [
 
 				if(result.rows.length === 1) {
 					let assignment_id = result.rows[0].id;
+					let test_dir = n_path.join(
+						setup.helpers.getAssignmentDir(assignment_id),
+						'tests'
+					);
 
-					await Dir.make(n_path.join(
-						setup.getKey('directories.data_root'),
-						'assignments',
-						`${assignment_id}`
-					));
+					await Dir.make(setup.helpers.getAssignmentDir(assignment_id));
+					await Dir.make(test_dir);
+
+					try {
+						if(typeof body.tests === 'string') {
+							let name = n_path.join(
+									test_dir,
+									`main.js`
+								);
+
+							await File.write(
+								name,
+								body.tests
+							);
+						}
+					} catch(err) {
+						log.error(`creating test files: ${err.stack}`);
+					}
 
 					await con.commitTrans();
 

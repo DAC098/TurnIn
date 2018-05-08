@@ -27,10 +27,9 @@ module.exports = [
 							found = true;
 
 							let read_file = fs.createReadStream(n_path.join(
-								setup.getKey('directories.data_root'),
-								'assignments',
-								`${req.assignment.id}`,
-								file.name));
+								setup.helpers.getAssignmentDir(req.assignment.id),
+								file.name
+							));
 
 							res.writeHead(200,{
 								'content-type': '',
@@ -89,9 +88,7 @@ module.exports = [
 					}
 
 					let file_path = n_path.join(
-						setup.getKey('directories.data_root'),
-						'assignments',
-						`${req.assignment.id}`,
+						setup.helpers.getAssignmentDir(req.assignment.id),
 						name
 					);
 
