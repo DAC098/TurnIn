@@ -114,6 +114,7 @@ export const StdInputView = styled(StdInputBase)`
 		outline: none;
 
 		font-size: 16px;
+		color: ${props => props.theme.text.primary};
 
 		&.input-focused {
 			border-color: ${props => props.theme.primary_one};

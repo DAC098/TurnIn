@@ -17,13 +17,13 @@ export const Button = styled.button`
 	border-radius: 2px;
 	min-width: 50px;
 	min-height: ${props => props.mini ? '30px' : '50px'};
-	background-color: ${props => props.primary ? props.theme.primary01 : props.theme.primaryA01};
-	color: white;
+	background-color: ${props => props.primary ? props.theme.primary_one : props.theme.secondary};
+	color: ${props => props.theme.text.primary};
 	
 	cursor: pointer;
 	
 	&:disabled {
-		background-color: ${props => colors.gray400}
+		background-color: ${colors.gray400}
 	}
 `;
 
