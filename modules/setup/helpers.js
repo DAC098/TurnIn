@@ -31,3 +31,18 @@ const getAssignmentDir = (id) => {
 };
 
 exports.getAssignmentDir = getAssignmentDir;
+
+/**
+ *
+ * @param id {string|number}
+ * @returns {string}
+ */
+const getImageDir = id => {
+	return n_path.join(
+		setup.getKey('directories.data_root'),
+		'images',
+		`${id}`
+	);
+};
+
+exports.getImageDir = getImageDir;
