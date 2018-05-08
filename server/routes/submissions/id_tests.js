@@ -6,23 +6,23 @@ const File = require('modules/fs/File');
 module.exports = [
 	[
 		{
-			path: '/:id([0-9]+)/results',
+			path: '/:id([0-9]+)/tests',
 			methods: 'get'
 		},
 		async (req,res) => {
-			let results_path = n_path.join(
+			let tests_path = n_path.join(
 				setup.helpers.getSubmissionDir(req.submission.id),
 				'results',
-				'data.json'
+				'tests.json'
 			);
 
-			if(await File.exists(results_path)) {
-				let json = JSON.parse(await File.read(results_path));
+			if(await File.exists(tests_path)) {
+				let json = JSON.parse(await File.read(tests_path));
 
 				await res.endJSON(json);
 			} else {
 				await res.endJSON(404,{
-					'message': 'no results found'
+					'message': 'no tests found'
 				});
 			}
 		}

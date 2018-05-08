@@ -15,9 +15,7 @@ module.exports = [
 		},
 		async (req,res) => {
 			let extract_json_path = n_path.join(
-				setup.getKey('directories.data_root'),
-				'submissions',
-				`${req.submission.id}`,
+				setup.helpers.getSubmissionDir(req.submission.id),
 				'extracts',
 				'data.json'
 			);
@@ -48,9 +46,7 @@ module.exports = [
 									found = true;
 
 									let read_file = fs.createReadStream(n_path.join(
-										setup.getKey('directories.data_root'),
-										'submissions',
-										`${req.submission.id}`,
+										setup.helpers.getSubmissionDir(req.submission.id),
 										'extracts',
 										r.filename
 									));
