@@ -1,12 +1,14 @@
-const db = require('../index');
 const security = require('../../security');
 
-const validUser = async (username,password) => {
-	let con  = null;
-
+/**
+ *
+ * @param username {string}
+ * @param password {string}
+ * @param con      {SQLConnection}
+ * @returns {Promise<*>}
+ */
+const validUser = async (username,password,con) => {
 	try {
-		let pool = db.getPool();
-		con = await pool.connect();
 		let query = `select * from users where username = '${username}'`;
 
 		let res = await con.query(query);
@@ -45,9 +47,6 @@ const validUser = async (username,password) => {
 			}
 		}
 	} catch(err) {
-		if(con)
-			con.release();
-
 		throw err;
 	}
 };

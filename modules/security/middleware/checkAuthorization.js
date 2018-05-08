@@ -1,6 +1,7 @@
 const setup = require('../../setup/index');
 const log = require('../../log/index');
 const security = require('../index');
+const db = require('modules/psql');
 
 const validUser = require('../../psql/helpers/validUser');
 
@@ -11,6 +12,8 @@ const atob = (string) => {
 };
 
 const checkAuthorization = async (req,res) => {
+	let con = null;
+
 	if(typeof req.headers['authorization'] === 'string') {
 		let split = req.headers['authorization'].split(' ');
 
@@ -21,7 +24,11 @@ const checkAuthorization = async (req,res) => {
 				let password = parsed.slice(1).join(':');
 
 				try {
-					let result = await validUser(username,password);
+					con = await db.connect();
+
+					let result = await validUser(username,password,con);
+
+					con.release();
 
 					if(!result.success) {
 						if(!result.username) {
@@ -41,6 +48,9 @@ const checkAuthorization = async (req,res) => {
 
 					req.user = result.user;
 				} catch(err) {
+					if(con)
+						con.release();
+
 					log.error(err.stack);
 					await res.endError(err);
 				}
