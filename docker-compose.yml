@@ -3,7 +3,7 @@ version: "3"
 
 services:
   asset-bundle:
-    image: "node:9.10.1"
+    image: "node:10.0.0"
     volumes:
       - "./:/app"
     working_dir: "/app"
@@ -11,7 +11,7 @@ services:
       - "NODE_ENV=development"
     command: "./node_modules/.bin/webpack --config webpack.config.js --watch"
   server:
-    image: "node:9.10.1"
+    image: "node:10.0.0"
     depends_on:
       - redis
       - psql
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     command: "node ./server/index.js --c-psql.hostname psql --c-redis.hostname redis"
   worker:
-    image: "node:9.10.1"
+    image: "node:10.0.0"
     depends_on:
       - redis
       - psql
