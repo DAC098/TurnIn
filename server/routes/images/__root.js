@@ -1,6 +1,13 @@
+const n_path = require('path');
+
 const _ = require('lodash');
+const tar = require('tar');
 
 const db = require('modules/psql');
+const File = require('modules/fs/File');
+const Dir = require('modules/fs/Dir');
+const log = require('modules/log');
+const setup = require('modules/setup');
 const listImages = require('modules/psql/helpers/images/listImages');
 
 const isJsonContent = require('modules/middleware/isJsonContent');
@@ -58,7 +65,8 @@ module.exports = [
 				 *     image_name: string,
 				 *     options: variables.default_image_options,
 				 *     image_type: string,
-				 *     image_url: string
+				 *     image_url: string,
+				 *     dockerfile: string=
 				 * }}
 				 */
 				let body = await parser.json(req);
@@ -112,6 +120,41 @@ module.exports = [
 
 				let result = await con.query(query);
 
+				if(body.dockerfile && result.rows.length === 1) {
+					let image_data = result.rows[0];
+					let iteration = 1;
+					let dockerfile_path = `/tmp/Dockerfile_${Date.now()}`;
+
+					try {
+						while(await (Dir.exists(dockerfile_path + '_' + iteration)))
+							++iteration;
+
+						dockerfile_path = dockerfile_path + '_' + iteration;
+
+						await Dir.make(dockerfile_path);
+						await File.write(`${dockerfile_path}/Dockerfile`,body.dockerfile);
+
+						await tar.create({
+							gzip: false,
+							file: n_path.join(
+								setup.helpers.getImageDir(image_data.id),
+								'Dockerfile.tar'
+							),
+							cwd: dockerfile_path
+						},['Dockerfile']);
+
+						let tar_result = await con.query(`
+						update images set dockerfile = true where id = ${image_data.id}
+						`);
+
+						await Dir.remove(dockerfile_path,true);
+
+						log.info('created dockerfile tar archive');
+					} catch(err) {
+						log.error(`failed to create Dockerfile tar archive for image: ${err.stack}`);
+					}
+				}
+
 				await res.endJSON({
 					'length': result.rows.length,
 					'result': result.rows.length === 1 ? [result.rows[0]] : []
@@ -119,6 +162,9 @@ module.exports = [
 			} catch(err) {
 				await res.endError(err);
 			}
+
+			if(con)
+				con.release();
 		}
 	]
 ];
