@@ -17,6 +17,7 @@ const getAssignmentData = require('modules/psql/helpers/getAssignmentData');
 const getSubmissionData = require('modules/psql/helpers/getSubmissionData');
 
 const router = require('../router');
+const testing = require('../run_tests');
 
 const route_info = {
 	path: '/run',
@@ -465,6 +466,43 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 		});
 	}
 
+	let tests_json_path = n_path.join(results_dir,'tests.json');
+	let tests_json = await File.exists(tests_json_path) ?
+		JSON.parse(await File.read(tests_json_path)) :
+		{runs:[]};
+
+	try {
+		log.info('attempting to run vm');
+
+		const sandbox = testing.getContext(assignment_info,submission_info);
+		const code = await testing.getTestFile(assignment_info);
+
+		if(code !== null) {
+			let value = await testing.runVM(sandbox,code);
+
+			tests_json.runs.push({
+				ran: true,
+				results: value
+			});
+		} else {
+			tests_json.runs.push({
+				ran: false,
+				results: null
+			});
+		}
+	} catch(err) {
+		log.error(`running test vm: ${err.stack}`,{
+			submission: submission_info.id,
+			assignment: assignment_info.id
+		});
+		tests_json.runs.push({
+			ran: false,
+			error: err.message
+		});
+	}
+
+	await File.write(tests_json_path,JSON.stringify(tests_json));
+
 	try {
 		if(mount_files) {
 			log.info('cleaning mount',{
@@ -480,4 +518,6 @@ router.addRoute(route_info,isJsonContent(), async (req,res) => {
 	}
 
 	in_progress.delete(submission_info.id);
+
+	log.info('run complete');
 });

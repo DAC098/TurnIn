@@ -138,7 +138,7 @@ router.addRoute({
 		});
 	}
 
-	if(build_image.Containers >= 1) {
+	if(build_image !== null && build_image.Containers >= 1) {
 		log.warn('containers are currently using this image',{
 			image_id: image_info.id
 		});
