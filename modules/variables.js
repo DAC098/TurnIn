@@ -35,7 +35,23 @@ const default_permissions = {
 	'networking': {
 		'exposing': false,
 		'mapping' : false
-	}
+	},
+	'groups': {
+		'create': false,
+		'modify': false,
+		'delete': false
+	},
+	'submissions': {
+		'create': false,
+		'modify': false,
+		'grade': false,
+		'delete': false
+	},
+	'assignments': {
+		'create': false,
+		'modify': false,
+		'delete': false
+	},
 };
 
 exports.default_permissions = default_permissions;
