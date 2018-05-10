@@ -218,12 +218,8 @@ const loadTestData = async () => {
 
 exports.loadTestData = loadTestData;
 
-const startup = async () => {
-	let con = null;
-
+const createMasterUser = async (con) => {
 	try {
-		let pool = db.getPool();
-		con = await pool.connect();
 		let master_check_query = `select * from users where username = 'master'`;
 
 		let res = await con.query(master_check_query);
@@ -247,9 +243,29 @@ const startup = async () => {
 	} catch(err) {
 		log.error(err.stack);
 	}
+};
 
-	if(con)
-		con.release();
+const createDefaultGroups = async (con) => {
+
+};
+
+const startup = async () => {
+	let con = null;
+
+	try {
+		con = await db.connect();
+	} catch(err) {
+		log.error(err.stack);
+	}
+
+	if(!con) {
+		log.warn('no database connection');
+		return;
+	}
+
+	await createMasterUser(con);
+
+	con.release();
 };
 
 exports.startup = startup;
