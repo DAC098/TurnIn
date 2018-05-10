@@ -63,7 +63,7 @@ module.exports = [
 
 				let body = await parser.json(req);
 
-				let {success,returned,user} = await createUser(req.user,_.merge({},body,{type:'user',is_student:true,is_teacher:false}));
+				let {success,returned,user} = await createUser(req.user,_.merge({},body,{type:'user',is_student:true,is_teacher:false}),con);
 
 				if(success) {
 					await res.endJSON({

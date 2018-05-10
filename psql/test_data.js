@@ -2,6 +2,8 @@ const db = require('modules/psql');
 const log = require('modules/log');
 const setup = require('modules/setup');
 
+const createUser = require('modules/psql/helpers/createUser');
+
 let users = new Map([
 	[
 		'test_user',
@@ -286,7 +288,19 @@ let submissions = new Map([
 ]);
 
 const createUsers = async (con) => {
+	for(let [username,data] of users) {
+		let result = await createUser({'type':'master'},data,con);
 
+		if(result.success) {
+			users.set(username,result.user);
+		} else {
+			if(result.reason === 'username already used') {
+				users.set(username,result.user);
+			} else {
+				log.warn(`failed to create user: ${result.reason}`);
+			}
+		}
+	}
 };
 
 const createSections = async (con) => {
