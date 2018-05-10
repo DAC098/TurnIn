@@ -1,7 +1,5 @@
 \connect turnin
 
-CREATE TYPE semesters AS ENUM ('spring','summer','fall','winter');
-
 CREATE TABLE sections (
 id         SERIAL PRIMARY KEY,
 title      VARCHAR NOT NULL,
