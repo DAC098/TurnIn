@@ -146,8 +146,6 @@ const createUser = async (user,body,con) => {
 				email,
 				permissions,
 				type,
-				is_student,
-				is_teacher,
 				fname as name__first,
 				lname as name__last`;
 
