@@ -3,6 +3,7 @@ const path = require('path');
 
 const Setup = require('./Setup');
 const File = require('../fs/File');
+const Dir = require('../fs/Dir');
 
 const traverseKeys = obj => {
 	let rtn = new Map();
@@ -129,6 +130,19 @@ const processCliArgs = async () => {
 };
 
 setup['processCliArgs'] = processCliArgs;
+
+const checkDirectories = async () => {
+	let data_dir = setup.getKey('directories.data_root');
+	let checking = ['assignments','images','submissions'];
+
+	for(let dir of checking) {
+		if(!await Dir.exists(path.join(data_dir,dir))) {
+			await Dir.make(path.join(data_dir,dir));
+		}
+	}
+};
+
+setup['checkDirectories'] = checkDirectories;
 
 module.exports = setup;
 

@@ -1,10 +1,7 @@
 const process = require('process');
 
 const log = require('modules/log');
-const setup = require('modules/setup');
-const configure = require('modules/setup/configure');
-
-const server = require('./main');
+const startup = require('modules/startup');
 
 process.on('exit',code => {
 	log.warn('process exiting',{code});
@@ -18,36 +15,9 @@ process.on('uncaughtException',err => {
 (async () => {
 	log.setName('worker');
 
-	log.info('loading /etc/turnin');
-	await setup.loadEtc();
+	await startup();
 
-	log.info('processing cli arguments');
-	await setup.processCliArgs();
-
-	log.info('config',setup.get());
-
-	log.info('running configure');
-	await configure.run();
-
-	const db_init = require('modules/psql/startup');
-
-	db_init.setupPool();
-
-	try {
-		log.info('checking database connection');
-
-		let connected = await db_init.awaitConnection(3,1000 * 3);
-
-		if(!connected) {
-			log.warn('unable to connect to database');
-			return;
-		} else {
-			log.info('connected to database');
-		}
-	} catch(err) {
-		log.error(err.stack);
-		return;
-	}
+	const server = require('./main');
 
 	try {
 		log.info('creating server');
