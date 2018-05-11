@@ -9,7 +9,7 @@ elevation   INT DEFAULT 0 CHECK (elevation >= 0 and elevation <= 10)
 CREATE TABLE group_references (
 group_name VARCHAR NOT NULL,
 table_id   INT NOT NULL,
-table_name group_referecne_Tables NOT NULL
+table_name group_reference_Tables NOT NULL
 );
 
 CREATE TABLE group_members (
