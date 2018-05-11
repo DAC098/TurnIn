@@ -323,7 +323,12 @@ const createSubmissions = async (con) => {
 
 };
 
+let run_ops = false;
+
 const run = async () => {
+	if(run_ops)
+		return;
+
 	let con = null;
 	let run_list = [
 		createUsers,
@@ -354,6 +359,8 @@ const run = async () => {
 	}
 
 	con.release();
+
+	run_ops = true;
 };
 
 module.exports = run;
