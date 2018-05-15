@@ -14,6 +14,16 @@ FOREIGN KEY (section_id) REFERENCES sections(id),
 CONSTRAINT unique_title_section UNIQUE(title,section_id)
 );
 
+CREATE TRIGGER check_group_reference_for_assignment
+    AFTER DELETE ON assignments
+    FOR EACH ROW
+    EXECUTE PROCEDURE delete_group_reference_for_table('assignments');
+
+CREATE TRIGGER check_user_reference_for_assignment
+    AFTER DELETE ON assignments
+    FOR EACH ROW
+    EXECUTE PROCEDURE delete_user_reference_for_table('assignments');
+
 CREATE TABLE assignment_files (
 filename      VARCHAR NOT NULL,
 assignment_id INT NOT NULL,

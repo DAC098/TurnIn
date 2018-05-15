@@ -13,3 +13,13 @@ dockerfile   BOOLEAN,
 image_url    VARCHAR,
 FOREIGN KEY (image_owner) REFERENCES users(id)
 );
+
+CREATE TRIGGER check_group_reference_for_image
+    AFTER DELETE ON images
+    FOR EACH ROW
+    EXECUTE PROCEDURE delete_group_reference_for_table('images');
+
+CREATE TRIGGER check_user_reference_for_image
+    AFTER DELETE ON images
+    FOR EACH ROW
+    EXECUTE PROCEDURE delete_user_reference_for_table('images');
