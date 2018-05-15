@@ -1,10 +1,10 @@
 const _ = require('lodash');
 
-const db = require('../index');
-const util = require('../util');
-const security = require('../../security');
+const db = require('../../index');
+const util = require('../../util');
+const security = require('../../../security/index');
 
-const variables = require('../../variables');
+const variables = require('../../../variables');
 
 /**
  *
