@@ -3,7 +3,7 @@ const log = require('../../log/index');
 const security = require('../index');
 const db = require('modules/psql');
 
-const validUser = require('../../psql/helpers/validUser');
+const validUser = require('../../psql/helpers/users/validUser');
 
 const atob = (string) => {
 	if(Buffer.byteLength(string) !== string.length)
