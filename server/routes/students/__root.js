@@ -2,7 +2,7 @@ const _ = require('lodash');
 
 const db = require('modules/psql');
 const util = require('modules/psql/util');
-const createUser = require('modules/psql/helpers/createUser');
+const createUser = require('modules/psql/helpers/users/createUser');
 
 const parser = require('modules/parser');
 const isJsonContent = require('modules/middleware/isJsonContent');

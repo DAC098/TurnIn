@@ -1,7 +1,7 @@
 const db = require("modules/psql");
 const parser = require('modules/parser');
 
-const validUser = require("modules/psql/helpers/validUser");
+const validUser = require("modules/psql/helpers/users/validUser");
 
 module.exports = [
 	[
