@@ -6,6 +6,15 @@ module.exports = [
 	[
 		{
 			path: id_path,
+			methods: 'get'
+		},
+		async (req,res) => {
+			await res.endJSON(req.image);
+		}
+	],
+	[
+		{
+			path: id_path,
 			methods: 'put'
 		},
 		isJsonContent(),
