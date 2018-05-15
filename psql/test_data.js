@@ -2,11 +2,12 @@ const db = require('modules/psql');
 const log = require('modules/log');
 const setup = require('modules/setup');
 
-const createUser = require('modules/psql/helpers/createUser');
+const createUser = require('modules/psql/helpers/users/createUser');
+const createImage = require('modules/psql/helpers/images/createImage');
 
-let users = new Map([
+let users = [
 	[
-		'test_user',
+		{'type': 'master'},
 		{
 			"username": "test_user",
 			"password": "test_user",
@@ -17,7 +18,7 @@ let users = new Map([
 		}
 	],
 	[
-		'student_one',
+		{'type': 'master'},
 		{
 			"username": "student_one",
 			"password": "student_one",
@@ -27,7 +28,7 @@ let users = new Map([
 		}
 	],
 	[
-		'student_two',
+		{'type': 'master'},
 		{
 			"username": "student_two",
 			"password": "student_two",
@@ -35,7 +36,7 @@ let users = new Map([
 		}
 	],
 	[
-		'teacher_one',
+		{'type': 'master'},
 		{
 			"username": "teacher_one",
 			"password": "teacher_one",
@@ -44,7 +45,7 @@ let users = new Map([
 		}
 	],
 	[
-		'teacher_two',
+		{'type': 'master'},
 		{
 			"username": "teacher_two",
 			"password": "teacher_two",
@@ -54,7 +55,7 @@ let users = new Map([
 			"lname": "bot_two"
 		}
 	]
-]);
+];
 
 let sections = new Map([
 	[
@@ -101,102 +102,85 @@ let sections = new Map([
 
 let images = new Map([
 	[
-		'node:9.10.0',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_two'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			};
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_two')",
 			"image_name": "node:9.10.0",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
-			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
+			"image_type": "hub"
 		}
 	],
 	[
-		'ubuntu:16.04',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_two'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			};
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_two')",
 			"image_name": "ubuntu:16.04",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
-			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
+			"image_type": "hub"
 		}
 	],
 	[
-		'postgres:10.1',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_two'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			}
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_two')",
 			"image_name": "postgres:10.1",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
-			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
+			"image_type": "hub"
 		}
 	],
 	[
-		'node:8.11.1',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_one'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			};
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_one')",
 			"image_name": "node:8.11.1",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
-			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
+			"image_type": "hub"
 		}
 	],
 	[
-		'redis:latest',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_one'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			};
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_one')",
 			"image_name": "redis:latest",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
 			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
 		}
 	],
 	[
-		'node:6.14.1',
+		async (con) => {
+			let res = await con.query(`select * from users where username = 'teacher_one'`);
+
+			return {
+				"id": res.rows.length === 1 ? res.rows[0]['id'] : 0
+			};
+		},
 		{
-			"image_owner": "(select id from users where username = 'teacher_one')",
 			"image_name": "node:6.14.1",
-			"options": {
-				"extract": [],
-				"submission_mount": "/app",
-				"build_commands": [],
-				"test_commands": []
-			},
 			"image_type": "hub",
-			"image_status": "ready",
-			"image_exists": true
 		}
 	]
 ]);
+
 
 let assignments = new Map([
 	[
@@ -287,18 +271,34 @@ let submissions = new Map([
 	}
 ]);
 
-const createUsers = async (con) => {
-	for(let [username,data] of users) {
-		let result = await createUser({'type':'master'},data,con);
+const getArguments = async (data,con) => {
+	let args = [];
 
-		if(result.success) {
-			users.set(username,result.user);
-		} else {
-			if(result.reason === 'username already used') {
-				users.set(username,result.user);
+	for(let a of data) {
+		if(typeof a === 'function') {
+			let rtn = a(con);
+
+			if(typeof rtn.then === 'function') {
+				args.push(await rtn);
 			} else {
-				log.warn(`failed to create user: ${result.reason}`);
+				args.push(rtn);
 			}
+		} else {
+			args.push(a);
+		}
+	}
+
+	return [...args,con];
+};
+
+const createUsers = async (con) => {
+	for(let data of users) {
+		let args = await getArguments(data,con);
+
+		let result = await createUser(...args);
+
+		if(!result.success && result.reason !== 'username already used') {
+			log.warn(`failed to create user: ${result.reason}`);
 		}
 	}
 };
@@ -308,7 +308,15 @@ const createSections = async (con) => {
 };
 
 const createImages = async (con) => {
+	for(let data of images) {
+		let args = await getArguments(data,con);
 
+		let result = await createImage(...args);
+
+		if(!result.success && result.reason !== 'image name already used') {
+			log.warn(`failed to create image: ${result.reason}`);
+		}
+	}
 };
 
 const createAssignments = async (con) => {
@@ -352,8 +360,14 @@ const run = async () => {
 
 	for(let fn of run_list) {
 		try {
+			await con.beginTrans();
+
 			await fn(con);
+
+			await con.commitTrans();
 		} catch(err) {
+			await con.rollbackTrans();
+
 			log.error(`running test data method: ${err.stack}`);
 		}
 	}
