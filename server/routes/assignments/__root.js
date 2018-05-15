@@ -32,10 +32,7 @@ module.exports = [
 
 				let results = await con.query(query);
 
-				await res.endJSON({
-					'length': results.rows.length,
-					'result': results.rows
-				});
+				await res.endJSON(results.rows);
 			} catch(err) {
 				await res.endError(err);
 			}
@@ -154,10 +151,7 @@ module.exports = [
 
 					await con.commitTrans();
 
-					await res.endJSON({
-						'length': result.rows.length,
-						'result': result.rows
-					});
+					await res.endJSON(result.rows[0]);
 				} else {
 					await res.endJSON(500,{
 						'message': 'unable to create assignment'

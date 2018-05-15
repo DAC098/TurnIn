@@ -25,7 +25,7 @@ module.exports = [
 
 				if(assignment === undefined) {
 					await res.endJSON(404,{
-						'message': 'assignment not found id db'
+						'message': 'assignment not found in db'
 					});
 					return false;
 				}

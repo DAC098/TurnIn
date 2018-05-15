@@ -8,8 +8,6 @@ const parser = require('modules/parser');
 const Dir = require('modules/fs/Dir');
 const log = require('modules/log');
 
-const getAssignmentData = require('modules/psql/helpers/getAssignmentData');
-
 const id_assignment_path = '/:id([0-9]+)';
 
 module.exports = [
@@ -19,24 +17,7 @@ module.exports = [
 			methods: 'get'
 		},
 		async (req,res) => {
-			let con = null;
-
-			try {
-				con = await db.connect();
-
-				let result = await getAssignmentData(req.params.id,con);
-				let found = result !== undefined;
-
-				await res.endJSON({
-					'length': found ? 1 : 0,
-					'result': found ? [result] : []
-				});
-			} catch(err) {
-				await res.endError(err);
-			}
-
-			if(con)
-				con.release();
+			await res.endJSON(req.assignment);
 		}
 	],
 	[
@@ -62,38 +43,38 @@ module.exports = [
 				 * }}
 				 */
 				let section_data = await parser.json(req);
-				let update_values = [];
+				let update_values = new db.util.QueryBuilder();
 
 				if(typeof section_data.title === 'string') {
-					update_values.push(`title = '${section_data.title}'`);
+					update_values.strField('title',section_data.title);
 				}
 
 				if(typeof section_data.section_id === 'number') {
-					update_values.push(`section_id = ${section_data.section_id}`);
+					update_values.numField('section_id',section_data.section_id);
 				}
 
 				if(typeof section_data.description === 'string') {
-					update_values.push(`description = '${section_data.description}'`);
+					update_values.strField('description',section_data.description);
 				}
 
 				if(typeof section_data.points === 'number') {
-					update_values.push(`points = ${section_data.points}`);
+					update_values.numField('points',section_data.points);
 				}
 
 				if(typeof section_data.open_date === 'string') {
 					let date = new Date(section_data.open_date);
-					update_values.push(`open_date = '${date.toUTCString()}'`);
+					update_values.strField('open_data',data.toUTCString());
 				}
 
 				if(typeof section_data.close_date === 'string') {
 					let date = new Date(section_data.close_date);
-					update_values.push(`close_date = '${date.toUTCString()}'`);
+					update_values.strField('close_data',date.toUTCString());
 				}
 
 				let query = `
 				update assignments
-				set ${update_values.join(',')}
-				where id = ${req.params.id}
+				set ${update_values.getInsertStr()}
+				where id = ${req.assignment.id}
 				returning *
 				`;
 
@@ -103,10 +84,7 @@ module.exports = [
 
 				await con.commitTrans();
 
-				await res.endJSON({
-					'length': result.rows.length,
-					'result': result.rows
-				});
+				await res.endJSON(result.rows[0]);
 			} catch(err) {
 				if(con)
 					await con.rollbackTrans();
