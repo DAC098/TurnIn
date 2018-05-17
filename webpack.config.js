@@ -29,7 +29,6 @@ module.exports = async (...args) => {
 		},
 		output: {
 			path: path.join(__dirname, './assets/scripts'),
-			publicPath: '/assets/scripts/',
 			filename: '[name].js',
 			chunkFilename: '[name].js'
 		},
@@ -48,7 +47,6 @@ module.exports = async (...args) => {
 		resolve: {
 			extensions: ['.js', '.jsx', '.json']
 		},
-		devtool: 'source-map',
 		optimization: {
 			splitChunks: {
 				cacheGroups: {
@@ -64,17 +62,20 @@ module.exports = async (...args) => {
 					}
 				}
 			},
-			runtimeChunk: true
+			runtimeChunk: 'single'
 		},
 		plugins: [
 			new webpack.DefinePlugin(env_vars),
-			// new webpack.SourceMapDevToolPlugin({
-			// 	filename: '[file].map',
-			// 	exclude: ['vendor', 'init'],
-			// 	publicPath: '/assets/scripts/'
-			// }),
-			process.env.NODE_ENV === 'production' ? new BabiliPlugin() : () => {
-			},
+			process.env.NODE_ENV === 'production' ?
+				() => {} :
+				new webpack.SourceMapDevToolPlugin({
+					filename: '[file].map',
+					exclude: ['vendor', 'runtime'],
+					publicPath: '/assets/scripts/'
+				}),
+			process.env.NODE_ENV === 'production' ?
+				new BabiliPlugin() :
+				() => {},
 			new ManifestPlugin({
 				publicPath: '/assets/scripts/',
 				filename: 'manifest.json',
