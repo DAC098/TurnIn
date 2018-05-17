@@ -154,6 +154,9 @@ class QueryBuilder {
 	}
 
 	static sanitize(type,value) {
+		if(value === undefined || value === null)
+			return 'NULL';
+
 		switch(type) {
 			case 'string':
 				let rtn = `${value}`;
@@ -192,14 +195,39 @@ class QueryBuilder {
 		return rtn;
 	}
 
+	typeofField(field,value) {
+		switch(typeof value) {
+			case 'number':
+				this.numField(field,value);
+				break;
+			case 'boolean':
+				this.boolField(field,value);
+				break;
+			case 'object':
+				this.objField(field,value);
+				break;
+			case 'string':
+			default:
+				this.strField(field,value);
+		}
+	}
 
+	objField(field,value) {
+		this[inserts_sym].set(
+			QueryBuilder.sanitize('string',field),
+			{
+				type: 'object',
+				value: value
+			}
+		)
+	}
 
 	strField(field,value) {
 		this[inserts_sym].set(
 			QueryBuilder.sanitize('string',field),
 			{
 				type: 'string',
-				value: QueryBuilder.sanitize('string',value)
+				value: value
 			}
 		);
 	}
@@ -209,7 +237,7 @@ class QueryBuilder {
 			QueryBuilder.sanitize('string',field),
 			{
 				type: 'number',
-				value: QueryBuilder.sanitize('number',value)
+				value: value
 			}
 		);
 	}
@@ -219,7 +247,7 @@ class QueryBuilder {
 			QueryBuilder.sanitize('string',field),
 			{
 				type: 'bool',
-				value: QueryBuilder.sanitize('bool',value)
+				value: value
 			}
 		);
 	}
@@ -236,9 +264,11 @@ class QueryBuilder {
 			switch(f.type) {
 				case 'number':
 				case 'bool':
-					return `${f.value}`;
+					return `${QueryBuilder.sanitize(f.type,f.value)}`;
 				case 'string':
-					return `'${f.value}'`;
+					return `'${QueryBuilder.sanitize('string',f.value)}'`;
+				case 'object':
+					return `'${QueryBuilder.sanitize('string',JSON.stringify(f.value))}'`;
 			}
 		} else {
 			return '';
