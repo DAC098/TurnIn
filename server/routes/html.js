@@ -33,6 +33,7 @@ const head_string = `
 	window.__SERVER_SETUP__ = ${JSON.stringify(setup_obj)};
 	window.__ASSET_MANIFEST__ = ${JSON.stringify(manifest)};
 </script>
+<script type="application/javascript" src="/assets/scripts/runtime.js"></script>
 `;
 
 const getAppHTML = () => `
@@ -40,7 +41,6 @@ const getAppHTML = () => `
 <html lang="en">
 	<head>
 	${head_string}
-	<script type="application/javascript" src="/assets/scripts/runtime~app.js"></script>
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'scripts/common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
 	${is_dev && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
@@ -59,7 +59,6 @@ const getLoginHTML = () => `
 <html lang="en">
 	<head>
 	${head_string}
-	<script type="application/javascript" src="/assets/scripts/runtime~login.js"></script>
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'scripts/common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
 	${is_dev && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
