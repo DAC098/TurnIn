@@ -45,8 +45,7 @@ module.exports = [
 			let con = null;
 
 			try {
-				let pool = db.getPool();
-				con = await pool.connect();
+				con = await db.connect();
 
 				/**
 				 * @type {{
@@ -78,12 +77,14 @@ module.exports = [
 					'length': result.rows.length,
 					'result': result.rows
 				});
+
+				con.release();
 			} catch(err) {
+				if(con)
+					con.release();
+
 				await res.endError(err);
 			}
-
-			if(con)
-				con.release();
 		}
 	]
 ];
