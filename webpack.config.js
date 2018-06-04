@@ -29,6 +29,7 @@ module.exports = async (...args) => {
 		},
 		output: {
 			path: path.join(__dirname, './assets/scripts'),
+			publicPath: '/assets/scripts/',
 			filename: '[name].js',
 			chunkFilename: '[name].js'
 		},

@@ -28,6 +28,10 @@ class ImageList extends Component {
 		return null;
 	}
 
+	componentWillUnmount() {
+		console.log('will unmount ImageList');
+	}
+
 	componentDidMount() {
 		this.props.getImageList();
 	}

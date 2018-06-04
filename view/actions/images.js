@@ -23,7 +23,7 @@ export const getImageList = () => async dispatch => {
 		let json = await res.json();
 
 		if(res.status === 200) {
-			dispatch(responseImageList(false,'',json.result));
+			dispatch(responseImageList(false,'',json));
 		} else {
 			dispatch(responseImageList(true,json.message));
 		}

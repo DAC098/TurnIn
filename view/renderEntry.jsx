@@ -27,11 +27,11 @@ const renderEntry = (Comp) => {
 		render(
 			<Provider store={store}>
 				<CatchError>
-					<Router>
-						<ThemeProvider>
+					<ThemeProvider>
+						<Router>
 							<Comp/>
-						</ThemeProvider>
-					</Router>
+						</Router>
+					</ThemeProvider>
 				</CatchError>
 			</Provider>,
 			ren_tar,

@@ -11,12 +11,10 @@ FOREIGN KEY (teacher_id) REFERENCES users(id),
 CONSTRAINT unique_sections UNIQUE (num,year,semester)
 );
 
-CREATE TRIGGER check_group_reference_for_section
-    AFTER DELETE ON sections
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_group_reference_for_table('sections');
-
-CREATE TRIGGER check_user_reference_for_section
-    AFTER DELETE ON sections
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_user_reference_for_table('sections');
+CREATE TABLE sections_to_groups (
+    group_name VARCHAR NOT NULL,
+    section_id INT NOT NULL,
+    CONSTRAINT group_section_pkey PRIMARY KEY(group_name,section_id),
+    FOREIGN KEY (group_name) REFERENCES permission_groups(name),
+    FOREIGN KEY (section_id) REFERENCES sections(id)
+);
