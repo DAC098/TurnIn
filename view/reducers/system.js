@@ -7,7 +7,8 @@ const initial_state = {
 	req_close: {
 		fetching: false,
 		error: false,
-		message: ''
+		message: '',
+		stack: '',
 	}
 };
 
@@ -19,7 +20,8 @@ const systemReducer = (state = initial_state,action) => {
 				req_close: {
 					fetching: true,
 					error: false,
-					message: ''
+					message: '',
+					stack: ''
 				}
 			};
 		case RESPONSE_CLOSE_SERVER:
@@ -28,7 +30,8 @@ const systemReducer = (state = initial_state,action) => {
 				req_close: {
 					fetching: false,
 					error: action.err,
-					message: action.data
+					message: action.msg,
+					stack: action.stack
 				}
 			};
 		default:

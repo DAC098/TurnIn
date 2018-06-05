@@ -1,27 +1,28 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 
 import {getUserList} from '../actions/users';
 
-import Modal from './Modal';
 import {IconButton} from '../components/Buttons';
 import Icon from '../components/Icon';
+import ReqResultModal from '../components/ReqResultModal';
 
 class UserList extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			view_error_modal: false
+			view_error_modal: false,
+			fetching: false
 		};
 	}
 
-	getSnapshotBeforeUpdate(prev_props,prev_state) {
-		if(prev_props.req.fetching !== this.props.req.fetching) {
-			if(this.props.req.error) {
-				return {
-					show_error_modal: true
-				}
+	static getDerivedStateFromProps(props,state) {
+		if(props.req.fetching !== state.fetching) {
+			return {
+				fetching: props.req.fetching,
+				view_error_modal: props.req.error
 			}
 		}
 
@@ -30,16 +31,6 @@ class UserList extends Component {
 
 	componentDidMount() {
 		this.props.getUserList();
-	}
-
-	componentDidUpdate(prev_props,prev_state,snapshot) {
-		if(snapshot) {
-			if(snapshot.show_error_modal) {
-				this.setState(() => ({
-					view_error_modal: true
-				}));
-			}
-		}
 	}
 
 	hideErrorModal() {
@@ -52,9 +43,26 @@ class UserList extends Component {
 		let rtn = [];
 
 		for(let user of this.props.user_list) {
+			let user_name = 'no name set';
+			let name_set = false;
+
+			if(typeof user.name.first === 'string' && user.name.first.length !== 0) {
+				user_name = user.name.first;
+			}
+
+			if(typeof user.name.last === 'string' && user.name.last.length !== 0) {
+				if(name_set)
+					user_name += ' ' + user.name.last;
+				else
+					user_name = user.name.last;
+			}
+
 			rtn.push(<tr key={user.id}>
-				<td>{user.username}</td>
+				<td>
+					<Link to={`/users/${user.id}`}>{user.username}</Link>
+				</td>
 				<td>{user.email === null ? 'no email' : user.email}</td>
+				<td>{user_name}</td>
 				<td>{user.type}</td>
 			</tr>);
 		}
@@ -74,19 +82,18 @@ class UserList extends Component {
 		return (
 			<div>
 				<h4>
-					<span>Users</span>
-					<IconButton onClick={() => this.props.getUserList()}>
+					<IconButton disabled={this.state.fetching} onClick={() => this.props.getUserList()}>
 						<Icon>refresh</Icon>
 					</IconButton>
 				</h4>
 				{this.state.view_error_modal ?
-					<Modal>
-						<IconButton onClick={() => this.hideErrorModal()}>
-							<Icon>close</Icon>
-						</IconButton>
-						<span>there was a problem getting the user list</span>
-						<p>{this.props.req.message}</p>
-					</Modal>
+					<ReqResultModal
+						title={'there was a problem getting the user list'}
+						error={this.props.req.error}
+						stack={this.props.req.stack}
+						message={this.props.req.message}
+						onClose={() => this.hideErrorModal()}
+					/>
 					:
 					null
 				}
@@ -95,6 +102,7 @@ class UserList extends Component {
 					<tr>
 						<th>Username</th>
 						<th>Email</th>
+						<th>Name</th>
 						<th>Type</th>
 					</tr>
 					</thead>

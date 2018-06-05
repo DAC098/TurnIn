@@ -1,5 +1,6 @@
-import React, {Fragment,Component} from 'react';
-import {Switch,Route,Link} from 'react-router-dom';
+import React, {Fragment} from 'react';
+import Loadable from 'react-loadable';
+import {Switch,Route,Redirect} from 'react-router-dom';
 
 import usersReducer from '../reducers/users';
 import sectionsReducer from '../reducers/sections';
@@ -9,13 +10,8 @@ import reducer_registry from '../reducer_registry';
 import renderEntry from '../renderEntry';
 
 import Body from '../components/Body';
-
-import {lazyLoad} from '../components/Bundle';
-
-import UserList from '../containers/UserList';
-import SectionList from '../containers/SectionList';
-import ImageList from '../containers/ImageList';
-import HeaderCont from '../containers/HeaderCont';
+import HeaderCont from '../components/HeaderBar';
+import Loading from '../components/Loading';
 
 reducer_registry.addReducer('users',usersReducer);
 reducer_registry.addReducer('sections',sectionsReducer);
@@ -25,20 +21,30 @@ const App = (props) => <Fragment>
 	<HeaderCont/>
 	<Body>
 	<Switch>
-		<Route path={'/'} exact component={() => <Fragment>
-			<section style={{
-				display: 'flex',
-				flexDirection: 'row',
-				flexWrap: 'wrap'
-			}}>
-				<UserList/>
-				<SectionList/>
-				<ImageList/>
-			</section>
+		<Route path={'/'} exact component={() => <Redirect to={'/dashboard'}/>}/>
+		<Route path={'/dashboard'} exact component={() => <Fragment>
+			dashboard
 		</Fragment>}/>
-		<Route path={'/lorem'} component={lazyLoad(
-			import(/* webpackChunkName: "lorem" */'../components/LoremIpsum')
-		)}/>
+		<Route path={'/users/:id([0-9]{1,}|new)'} component={Loadable({
+			loader: () => import(/* webpackChunkName: "user_form" */'../components/UserFormPage'),
+			loading: Loading
+		})}/>
+		<Route path={'/users'} component={Loadable({
+			loader: () => import(/* webpackChunkName: "list_users" */'../containers/ListUsers'),
+			loading: Loading
+		})}/>
+		<Route path={'/sections'} component={Loadable({
+			loader: () => import(/* webpackChunkName: "list_sections" */'../containers/ListSections'),
+			loading: Loading
+		})}/>
+		<Route path={'/images'} component={Loadable({
+			loader: () => import(/* webpackChunkName: "list_images" */'../containers/ListImages'),
+			loading: Loading
+		})}/>
+		<Route path={'/lorem'} component={Loadable({
+			loader: () => import(/* webpackChunkName: "lorem" */'../components/LoremIpsum'),
+			loading: Loading
+		})}/>
 	</Switch>
 	</Body>
 </Fragment>;

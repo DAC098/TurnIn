@@ -66,7 +66,7 @@ class Req {
 		};
 
 		if(data)
-		obj['body'] = JSON.stringify(data);
+			obj['body'] = JSON.stringify(data);
 
 		return fetch(uri,obj);
 	}

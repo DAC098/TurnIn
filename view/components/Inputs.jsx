@@ -10,10 +10,6 @@ function StdInputBase(props) {
 		'has-error': props.error
 	});
 
-	let input_class = ClassNames({
-		'input-focused': props.input_focused
-	});
-
 	let placeholder = props.input_focused ? props.placeholder : null;
 
 	return <div className={container_class}>
@@ -22,16 +18,21 @@ function StdInputBase(props) {
 			id={props.id}
 			type={props.type || 'text'}
 			name={props.name || null}
-			onChange={event => props.handleChange(event)}
+			onChange={event => props.onValueChange(event.target.value)}
 			onFocus={() => props.onFocus()}
 			onBlur={() => props.onBlur()}
 			placeholder={placeholder}
-			className={input_class || null}
 			value={props.value}
 		/>
-		<span title={props.helper}>{props.helper || ''}</span>
+		<span title={props.helper}>{props.helper}</span>
 	</div>
 }
+
+StdInputBase.defaultProps = {
+	type: 'text',
+	helper: '',
+	onValueChange: () => {}
+};
 
 export const StdInputView = styled(StdInputBase)`
 	position: relative;
@@ -116,12 +117,12 @@ export const StdInputView = styled(StdInputBase)`
 		font-size: 16px;
 		color: ${props => props.theme.text.primary};
 
-		&.input-focused {
+		&:focus {
 			border-color: ${props => props.theme.primary_one};
 		}
 
-		&:not(.input-focused):hover {
-			border-color: ${colors.black};
+		&:not(:focus):hover {
+			border-color: ${props => props.theme.text.primary};
 		}
 
 		::-webkit-input-placeholder{
@@ -159,36 +160,17 @@ export class StdInput extends React.Component {
 		super(props);
 
 		this.state = {
-			input_focused: false,
-			has_value: false,
+			input_focused: false
 		};
-	}
-
-	handleChange(event) {
-		if(this.props.onChange)
-			this.props.onChange(event);
 	}
 
 	render() {
 		return <StdInputView
-			error={this.props.error}
 			input_focused={this.state.input_focused}
-			has_value={this.props.has_value}
-			onFocus={() => this.setState(prev_state => {
-				return {input_focused: true};
-			})}
-			onBlur={() => this.setState(prev_state => {
-				return {input_focused: false};
-			})}
-			handleChange={e => this.handleChange(e)}
+			onFocus={() => this.setState(prev_state => ({input_focused: true}))}
+			onBlur={() => this.setState(prev_state => ({input_focused: false}))}
 
-			id={this.props.id}
-			type={this.props.type}
-			label={this.props.label}
-			placeholder={this.props.placeholder}
-			name={this.props.name}
-			value={this.props.value}
-			helper={this.props.helper}
+			{...this.props}
 		/>;
 	}
 }

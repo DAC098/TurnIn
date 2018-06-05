@@ -6,7 +6,8 @@ const initial_state = {
 	req_image_list: {
 		fetching: false,
 		error: false,
-		message: ''
+		message: '',
+		stack: ''
 	},
 	image_list: []
 };
@@ -19,7 +20,8 @@ const imagesReducer = (state = initial_state,action) => {
 				req_image_list: {
 					fetching: true,
 					error: false,
-					message: ''
+					message: '',
+					stack: ''
 				}
 			};
 		case RESPONSE_IMAGE_LIST:
@@ -28,7 +30,8 @@ const imagesReducer = (state = initial_state,action) => {
 				req_image_list: {
 					fetching: false,
 					error: action.err,
-					message: action.msg
+					message: action.msg,
+					stack: action.stack
 				},
 				image_list: action.err ? state.image_list : action.data
 			};

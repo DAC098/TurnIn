@@ -9,9 +9,10 @@ export const requestImageList = () => ({
 
 export const responseImageList = (err,msg,data) => ({
 	type: RESPONSE_IMAGE_LIST,
-	err: !!err,
+	err: err,
 	msg,
-	data
+	stack: err ? data : '',
+	data: err ? null : data
 });
 
 export const getImageList = () => async dispatch => {
@@ -25,7 +26,7 @@ export const getImageList = () => async dispatch => {
 		if(res.status === 200) {
 			dispatch(responseImageList(false,'',json));
 		} else {
-			dispatch(responseImageList(true,json.message));
+			dispatch(responseImageList(true,json.message,json.stack || ''));
 		}
 	} catch(err) {
 		dispatch(responseImageList(true,err.message));

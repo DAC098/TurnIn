@@ -7,7 +7,8 @@ const initial_state = {
 	req_section_list: {
 		fetching: false,
 		error: false,
-		message: ''
+		message: '',
+		stack: '',
 	},
 	section_list: []
 };
@@ -20,7 +21,8 @@ const sectionsReducer = (state = initial_state,action) => {
 				req_section_list: {
 					fetching: true,
 					error: false,
-					message: ''
+					message: '',
+					stack: ''
 				}
 			};
 		case RESPONSE_SECTION_LIST:
@@ -29,7 +31,8 @@ const sectionsReducer = (state = initial_state,action) => {
 				req_section_list: {
 					fetching: false,
 					error: action.err,
-					message: action.msg
+					message: action.msg,
+					stack: action.stack
 				},
 				section_list: action.err ? state.section_list : action.data
 			};

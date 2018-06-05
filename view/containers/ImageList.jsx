@@ -6,44 +6,31 @@ import {getImageList} from '../actions/images';
 import {IconButton} from '../components/Buttons';
 import Icon from '../components/Icon';
 import Modal from './Modal';
+import ReqResultModal from '../components/ReqResultModal';
 
 class ImageList extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			view_error_modal: false
+			view_error_modal: false,
+			fetching: false
 		};
 	}
 
-	getSnapshotBeforeUpdate(prev_props,prev_state) {
-		if(prev_props.req.fetching !== this.props.req.fetching) {
-			if(this.props.req.error) {
-				return {
-					show_error_modal: true
-				}
+	static getDerivedStateFromProps(props, state) {
+		if(props.req.fetching !== state.fetching) {
+			return {
+				fetching: props.req.fetching,
+				view_error_modal: props.req.error
 			}
 		}
 
 		return null;
 	}
 
-	componentWillUnmount() {
-		console.log('will unmount ImageList');
-	}
-
 	componentDidMount() {
 		this.props.getImageList();
-	}
-
-	componentDidUpdate(prev_props,prev_state,snapshot) {
-		if(snapshot) {
-			if(snapshot.show_error_modal) {
-				this.setState(() => ({
-					view_error_modal: true
-				}));
-			}
-		}
 	}
 
 	hideErrorModal() {
@@ -82,18 +69,18 @@ class ImageList extends Component {
 		return <div>
 			<h4>
 				<span>Images</span>
-				<IconButton onClick={() => this.props.getImageList()}>
+				<IconButton disabled={this.state.fetching} onClick={() => this.props.getImageList()}>
 					<Icon>refresh</Icon>
 				</IconButton>
 			</h4>
 			{this.state.view_error_modal ?
-				<Modal>
-					<IconButton onClick={() => this.hideErrorModal()}>
-						<Icon>close</Icon>
-					</IconButton>
-					<span>there was a problem getting the image list</span>
-					<p>{this.props.req.message}</p>
-				</Modal>
+				<ReqResultModal
+					title={'there was a problem getting the image list'}
+					error={this.props.req.error}
+					error_stack={this.props.req.stack}
+					message={this.props.req.message}
+					onClose={() => this.hideErrorModal()}
+				/>
 				:
 				null
 			}

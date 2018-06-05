@@ -50,11 +50,19 @@ export default class Bundle extends Component {
 	}
 }
 
-export const lazyLoad = (req,loading) => props => <Bundle
-	load={() => req}
->
-	{Comp => Comp ?
-		<Comp {...props}/> :
-		(loading || (() => <div>...loading</div>))
-	}
-</Bundle>;
+/**
+ *
+ * @param req
+ * @param loading
+ * @returns {function(*): *}
+ */
+export const lazyLoad = (req,loading) => {
+	return props => <Bundle
+		load={() => req}
+	>
+		{Comp => Comp ?
+			<Comp {...props}/> :
+			(loading || (() => <div>...loading</div>))
+		}
+	</Bundle>;
+};

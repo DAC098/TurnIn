@@ -9,9 +9,10 @@ export const requestUserList = () => ({
 
 export const responseUserList = (err,msg,data) => ({
 	type: RESPONSE_USER_LIST,
-	err: !!err,
+	err: err,
 	msg,
-	data
+	stack: err ? data : '',
+	data: err ? null : data
 });
 
 export const getUserList = () => async dispatch => {
@@ -25,7 +26,7 @@ export const getUserList = () => async dispatch => {
 		if(res.status === 200) {
 			dispatch(responseUserList(false,'',json));
 		} else {
-			dispatch(responseUserList(true,json.message));
+			dispatch(responseUserList(true,json.message,json.stack || ''));
 		}
 	} catch(err) {
 		dispatch(responseUserList(true,err.message))

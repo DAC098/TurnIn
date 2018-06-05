@@ -7,7 +7,8 @@ const initial_state = {
 	req_user_list: {
 		fetching: false,
 		error: false,
-		message: ''
+		message: '',
+		stack: ''
 	},
 	user_list: []
 };
@@ -20,7 +21,8 @@ const usersReducer = (state = initial_state,action) => {
 				req_user_list: {
 					fetching: true,
 					error: false,
-					message: ''
+					message: '',
+					stack: ''
 				}
 			};
 		case RESPONSE_USER_LIST:
@@ -29,9 +31,10 @@ const usersReducer = (state = initial_state,action) => {
 				req_user_list: {
 					fetching: false,
 					error: action.err,
-					message: action.msg
+					message: action.msg,
+					stack: action.stack
 				},
-				user_list: action.err ? state.user_list : action.data.result
+				user_list: action.err ? state.user_list : action.data
 			};
 		default:
 			return state;
