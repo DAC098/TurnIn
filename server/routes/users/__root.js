@@ -38,10 +38,7 @@ module.exports = [
 				let result = await con.query(query);
 
 				let rows = util.createObject(result.rows);
-				await res.endJSON({
-					'length': rows.length,
-					'result': rows
-				});
+				await res.endJSON(rows);
 			} catch(err) {
 				await res.endError(err);
 			}
