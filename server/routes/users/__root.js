@@ -54,9 +54,13 @@ module.exports = [
 		},
 		isJsonContent(),
 		async (req,res) => {
+			let con = null;
+
 			try {
+				con = await db.connect();
+
 				let body = await parseJson(req);
-				let result = await createUser(req.user,body);
+				let result = await createUser(req.user,body,con);
 
 				if(!result.success) {
 					await res.endJSON(400,{
@@ -68,7 +72,11 @@ module.exports = [
 						'result': [result.user]
 					});
 				}
+				con.release();
 			} catch(err) {
+				if(con)
+					con.release();
+				
 				await res.endError(err);
 			}
 		}
