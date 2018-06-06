@@ -175,25 +175,7 @@ export class StdInput extends React.Component {
 	}
 }
 
-function StdCheckBase(props) {
-	return <div className={props.className}>
-		<input
-			id={props.id || props.name}
-			name={props.name}
-			type="checkbox"
-			checked={props.checked}
-		/>
-		<label
-			htmlFor={props.id || props.name}
-			onClick={event => props.onChange(event)}
-		>
-			<i className="material-icons">{''}</i>
-			{props.label}
-		</label>
-	</div>;
-}
-
-export const StdCheck = styled(StdCheckBase)`
+const StdCheckStyle = styled.div`
 	position: relative;
 	padding: 1.5px 0;
 
@@ -242,6 +224,22 @@ export const StdCheck = styled(StdCheckBase)`
 		}
 	}
 `;
+
+export const StdCheck = (props) => <StdCheckStyle>
+	<input
+		id={props.id || props.name}
+		name={props.name}
+		type="checkbox"
+		checked={props.checked}
+	/>
+	<label
+		htmlFor={props.id || props.name}
+		onClick={event => props.onChange(event)}
+	>
+		<i className="material-icons">{''}</i>
+		{props.label}
+	</label>
+</StdCheckStyle>;
 
 /**
  * the standard switch available to a page

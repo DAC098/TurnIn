@@ -15,20 +15,15 @@ const ReqResultModal = (props) => <Modal>
 	>
 		<Icon>close</Icon>
 	</IconButton>
-	{props.override_default ?
-		props.children
+	<h4>{props.title}</h4>
+	<p>{props.message}</p>
+	{props.children}
+	{props.error &&
+	typeof props.stack === 'string' &&
+	props.stack.length !== 0 ?
+		<pre>{props.stack}</pre>
 		:
-		<Fragment>
-			<h4>{props.title}</h4>
-			<p>{props.message}</p>
-			{props.error &&
-			typeof props.stack === 'string' &&
-			props.stack.length !== 0 ?
-				<pre>{props.stack}</pre>
-				:
-				null
-			}
-		</Fragment>
+		null
 	}
 </Modal>;
 
