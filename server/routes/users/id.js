@@ -1,5 +1,6 @@
 const db = require('modules/psql');
 const util = require('modules/psql/util');
+const log = require('modules/log');
 
 const id_path = '/:id([0-9]{1,})';
 
@@ -36,13 +37,13 @@ module.exports = [
 					images.image_type as images__type,
 					images.dockerfile as images__dockerfile
 				from users
-				join group_members on
+				left join group_members on
 					users.id = group_members.user_id
-				join enrolled on
+				left join enrolled on
 					users.id = enrolled.users_id
-				join sections on
+				left join sections on
 					enrolled.section_id = sections.id
-				join images on
+				left join images on
 					users.id = images.image_owner
 				where
 					users.id = ${req.params.id}
