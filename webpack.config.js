@@ -40,7 +40,10 @@ module.exports = async (...args) => {
 					loader: 'babel-loader',
 					query: {
 						presets: ['react'],
-						plugins: ['syntax-dynamic-import']
+						plugins: [
+							'syntax-dynamic-import',
+							'syntax-object-rest-spread'
+						]
 					}
 				}
 			]
