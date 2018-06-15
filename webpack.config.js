@@ -45,7 +45,17 @@ module.exports = async (...args) => {
 							'syntax-object-rest-spread'
 						]
 					}
-				}
+				},
+				// {
+				// 	test: /\.worker\.js$/,
+				// 	use: {
+				// 		loader: 'worker-loader',
+				// 		options: {
+				// 			publicPath: '/res.php/ef/course_catalog/scripts/',
+				// 			name: '[name].js'
+				// 		}
+				// 	}
+				// }
 			]
 		},
 		resolve: {
@@ -68,6 +78,7 @@ module.exports = async (...args) => {
 			},
 			runtimeChunk: 'single'
 		},
+		devtool: 'none',
 		plugins: [
 			new webpack.DefinePlugin(env_vars),
 			process.env.NODE_ENV === 'production' ?
