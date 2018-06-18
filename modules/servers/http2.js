@@ -103,6 +103,10 @@ class http2Server extends EventEmitter {
 		this.instance.on('error',err => {
 			this.emit('error',err);
 		});
+
+		this.instance.on('unknownProtocol',(...args) => {
+			this.emit('unknownProtocol',...args);
+		});
 	}
 
 	async closeSessions() {
