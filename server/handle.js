@@ -67,7 +67,7 @@ const handle = async (req,res) => {
 	req.url_parsed = new URL(req.url,`https://${req.headers['host']}:443/`);
 
 	try {
-		log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}`);
+		log.info(`${req.method} ${req.url} HTTP/${req.httpVersion}${req.session ? ' ALPN: ' + req.session.alpnProtocol : ''}`);
 
 		let result = await router.run(req,res);
 

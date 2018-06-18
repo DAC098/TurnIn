@@ -47,7 +47,15 @@ server.on('session',session => {
 		log.debug('session connect',{uuid:session.pk});
 	});
 
-	log.debug('session connection',{uuid:session.pk});
+	session.on('localSettings',obj => {
+		log.debug('session local settings',{...obj,uuid:session.pk});
+	});
+
+	session.on('remoteSettings',obj => {
+		log.debug('session remote settings',{...obj,uuid:session.pk});
+	});
+
+	log.debug('session connection',{uuid:session.pk,alpn:session.alpnProtocol});
 });
 
 server.on('connection',socket => {
@@ -64,4 +72,10 @@ server.on('connection',socket => {
 	});
 
 	log.debug('socket created',{uuid:socket.pk});
+});
+
+server.on('unknownProtocol',(socket) => {
+	log.debug('unknown protocol requested',{socket});
+
+	socket.destroy();
 });
