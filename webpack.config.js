@@ -3,7 +3,6 @@ const path = require('path');
 const webpack = require('webpack');
 const _ = require('lodash');
 
-const BabiliPlugin = require('babili-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 
 function convertObj(obj) {
@@ -32,20 +31,27 @@ module.exports = async (...args) => {
 			filename: '[name].js',
 			chunkFilename: '[name].js'
 		},
+		devTool: "none",
 		module: {
 			rules: [
 				{
+					test: /\.tsx?$/,
+					loader: "awesome-typescript-loader"
+				},
+				{
 					test: /\.jsx$/,
-					loader: 'babel-loader',
-					query: {
-						presets: ['react'],
-						plugins: ['syntax-dynamic-import']
+					use: {
+						loader: 'babel-loader',
+						options: {
+							presets: ['@babel/preset-react'],
+							plugins: ['syntax-dynamic-import']
+						}
 					}
 				}
 			]
 		},
 		resolve: {
-			extensions: ['.js', '.jsx', '.json']
+			extensions: [".ts",".tsx",'.js', '.jsx', '.json']
 		},
 		optimization: {
 			splitChunks: {
@@ -73,9 +79,6 @@ module.exports = async (...args) => {
 					exclude: ['vendor', 'runtime'],
 					publicPath: '/assets/scripts/'
 				}),
-			process.env.NODE_ENV === 'production' ?
-				new BabiliPlugin() :
-				() => {},
 			new ManifestPlugin({
 				publicPath: '/assets/scripts/',
 				filename: 'manifest.json',

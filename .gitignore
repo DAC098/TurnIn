@@ -1,6 +1,7 @@
 # folders
 ignore
 assets/scripts
+third_party/*/
 
 # files
 *.ignore*
