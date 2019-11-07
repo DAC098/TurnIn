@@ -14,12 +14,10 @@ image_url    VARCHAR,
 FOREIGN KEY (image_owner) REFERENCES users(id)
 );
 
-CREATE TRIGGER check_group_reference_for_image
-    AFTER DELETE ON images
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_group_reference_for_table('images');
-
-CREATE TRIGGER check_user_reference_for_image
-    AFTER DELETE ON images
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_user_reference_for_table('images');
+CREATE TABLE images_to_groups (
+    group_name VARCHAR NOT NULL,
+    image_id   INT NOT NULL,
+    CONSTRAINT group_image_pkey PRIMARY KEY(group_name,image_id),
+    FOREIGN KEY (group_name) REFERENCES permission_groups(name),
+    FOREIGN KEY (image_id) REFERENCES images(id)
+);

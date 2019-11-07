@@ -3,19 +3,23 @@ import React, {Component} from 'react';
 export default class Bundle extends Component {
 	constructor(props) {
 		super(props);
+
 		console.log('constructing bundle');
+
 		this.state = {
 			mod: null
 		}
 	}
 
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
+		console.log('componentWillReceiveProps for Bundle');
 		if (nextProps.load !== this.props.load) {
 			this.load(nextProps);
 		}
 	}
 
 	componentDidMount() {
+		console.log('componentDidMount for Bundle');
 		this.load(this.props);
 	}
 
@@ -29,7 +33,7 @@ export default class Bundle extends Component {
 
 		try {
 			console.log('waiting on load');
-			let mod = await props.load;
+			let mod = await props.load();
 			console.log('finished load',mod);
 
 			this.setState(() => ({
@@ -46,12 +50,19 @@ export default class Bundle extends Component {
 	}
 }
 
-export function lazyLoad(req,loading) {
-	let load_comp = loading || (() => <div>...loading</div>);
-
+/**
+ *
+ * @param req
+ * @param loading
+ * @returns {function(*): *}
+ */
+export const lazyLoad = (req,loading) => {
 	return props => <Bundle
-			load={req}
-		>
-			{Comp => Comp ? <Comp {...props}/> : load_comp}
-		</Bundle>;
-}
+		load={() => req}
+	>
+		{Comp => Comp ?
+			<Comp {...props}/> :
+			(loading || (() => <div>...loading</div>))
+		}
+	</Bundle>;
+};

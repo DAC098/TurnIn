@@ -14,15 +14,13 @@ FOREIGN KEY (section_id) REFERENCES sections(id),
 CONSTRAINT unique_title_section UNIQUE(title,section_id)
 );
 
-CREATE TRIGGER check_group_reference_for_assignment
-    AFTER DELETE ON assignments
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_group_reference_for_table('assignments');
-
-CREATE TRIGGER check_user_reference_for_assignment
-    AFTER DELETE ON assignments
-    FOR EACH ROW
-    EXECUTE PROCEDURE delete_user_reference_for_table('assignments');
+CREATE TABLE assignments_to_groups (
+    group_name    VARCHAR NOT NULL,
+    assignment_id INT NOT NULL,
+    CONSTRAINT group_assignment_pkey PRIMARY KEY(group_name,assignment_id),
+    FOREIGN KEY (group_name) REFERENCES permission_groups(name),
+    FOREIGN KEY (assignment_id) REFERENCES assignments(id)
+);
 
 CREATE TABLE assignment_files (
 filename      VARCHAR NOT NULL,

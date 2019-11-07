@@ -13,6 +13,7 @@ export const THEMES = {
 		primary_two: colors.red700,
 		primary_thr: colors.red900,
 		secondary: colors.blueA400,
+		swap: colors.white,
 		text: {
 			primary: `rgb(${hexColorToDecimal('#ffffff')})`,
 			secondary: `rgba(${hexColorToDecimal('#ffffff')},0.7)`,
@@ -29,6 +30,7 @@ export const THEMES = {
 		primary_two: colors.red700,
 		primary_thr: colors.red900,
 		secondary: colors.blueA400,
+		swap: colors.black,
 		text: {
 			primary: `rgba(${hexColorToDecimal('#000000')},0.87)`,
 			secondary: `rgba(${hexColorToDecimal('#000000')},0.54)`,

@@ -3,37 +3,7 @@ import styled from 'styled-components';
 import ClassNames from 'classnames';
 import {colors} from '../colors';
 
-function StdInputBase(props) {
-	let container_class = ClassNames(props.className,{
-		'move-label': props.input_focused || props.has_value,
-		'has-focus': props.input_focused,
-		'has-error': props.error
-	});
-
-	let input_class = ClassNames({
-		'input-focused': props.input_focused
-	});
-
-	let placeholder = props.input_focused ? props.placeholder : null;
-
-	return <div className={container_class}>
-		<label htmlFor={props.id}>{props.label}</label>
-		<input
-			id={props.id}
-			type={props.type || 'text'}
-			name={props.name || null}
-			onChange={event => props.handleChange(event)}
-			onFocus={() => props.onFocus()}
-			onBlur={() => props.onBlur()}
-			placeholder={placeholder}
-			className={input_class || null}
-			value={props.value}
-		/>
-		<span title={props.helper}>{props.helper || ''}</span>
-	</div>
-}
-
-export const StdInputView = styled(StdInputBase)`
+const StdInputView = styled.div`
 	position: relative;
 	width: 100%;
 	padding-top: 30px;
@@ -116,12 +86,12 @@ export const StdInputView = styled(StdInputBase)`
 		font-size: 16px;
 		color: ${props => props.theme.text.primary};
 
-		&.input-focused {
+		&:focus {
 			border-color: ${props => props.theme.primary_one};
 		}
 
-		&:not(.input-focused):hover {
-			border-color: ${colors.black};
+		&:not(:focus):hover {
+			border-color: ${props => props.theme.text.primary};
 		}
 
 		::-webkit-input-placeholder{
@@ -151,6 +121,37 @@ export const StdInputView = styled(StdInputBase)`
 	}
 `;
 
+function StdInputBase(props) {
+	let container_class = ClassNames({
+		'move-label': props.input_focused || props.has_value,
+		'has-focus': props.input_focused,
+		'has-error': props.error
+	});
+
+	let placeholder = props.input_focused ? props.placeholder : null;
+
+	return <StdInputView className={container_class}>
+		<label htmlFor={props.id}>{props.label}</label>
+		<input
+			id={props.id}
+			type={props.type || 'text'}
+			name={props.name || null}
+			onChange={event => props.onValueChange(event.target.value)}
+			onFocus={() => props.onFocus()}
+			onBlur={() => props.onBlur()}
+			placeholder={placeholder}
+			value={props.value}
+		/>
+		<span title={props.helper}>{props.helper}</span>
+	</StdInputView>
+}
+
+StdInputBase.defaultProps = {
+	type: 'text',
+	helper: '',
+	onValueChange: () => {}
+};
+
 /**
  * the standard input option available to a page
  */
@@ -159,59 +160,22 @@ export class StdInput extends React.Component {
 		super(props);
 
 		this.state = {
-			input_focused: false,
-			has_value: false,
+			input_focused: false
 		};
 	}
 
-	handleChange(event) {
-		if(this.props.onChange)
-			this.props.onChange(event);
-	}
-
 	render() {
-		return <StdInputView
-			error={this.props.error}
+		return <StdInputBase
 			input_focused={this.state.input_focused}
-			has_value={this.props.has_value}
-			onFocus={() => this.setState(prev_state => {
-				return {input_focused: true};
-			})}
-			onBlur={() => this.setState(prev_state => {
-				return {input_focused: false};
-			})}
-			handleChange={e => this.handleChange(e)}
+			onFocus={() => this.setState(prev_state => ({input_focused: true}))}
+			onBlur={() => this.setState(prev_state => ({input_focused: false}))}
 
-			id={this.props.id}
-			type={this.props.type}
-			label={this.props.label}
-			placeholder={this.props.placeholder}
-			name={this.props.name}
-			value={this.props.value}
-			helper={this.props.helper}
+			{...this.props}
 		/>;
 	}
 }
 
-function StdCheckBase(props) {
-	return <div className={props.className}>
-		<input
-			id={props.id || props.name}
-			name={props.name}
-			type="checkbox"
-			checked={props.checked}
-		/>
-		<label
-			htmlFor={props.id || props.name}
-			onClick={event => props.onChange(event)}
-		>
-			<i className="material-icons">{''}</i>
-			{props.label}
-		</label>
-	</div>;
-}
-
-export const StdCheck = styled(StdCheckBase)`
+const StdCheckStyle = styled.div`
 	position: relative;
 	padding: 1.5px 0;
 
@@ -261,22 +225,23 @@ export const StdCheck = styled(StdCheckBase)`
 	}
 `;
 
-/**
- * the standard switch available to a page
- */
-function StdSwitchBase(props) {
-	let id = props.id || props.name;
+export const StdCheck = (props) => <StdCheckStyle>
+	<input
+		id={props.id || props.name}
+		name={props.name}
+		type="checkbox"
+		checked={props.checked}
+	/>
+	<label
+		htmlFor={props.id || props.name}
+		onClick={event => props.onChange(event)}
+	>
+		<i className="material-icons">{''}</i>
+		{props.label}
+	</label>
+</StdCheckStyle>;
 
-	return <div className={props.className}>
-		<input type="checkbox" id={id} name={props.name} checked={props.checked} onChange={event => props.onChange(event)} />
-		<label htmlFor={id}>{props.label}
-			<span className="toggle--on">{props.on_state || ''}</span>
-			<span className="toggle--off">{props.off_state || ''}</span>
-		</label>
-	</div>
-}
-
-export const StdSwitch = styled(StdSwitchBase)`
+const StdSwitchStyle = styled.div`
 	input {
 		display: none;
 
@@ -349,3 +314,24 @@ export const StdSwitch = styled(StdSwitchBase)`
 		}
 	}
 `;
+
+/**
+ * the standard switch available to a page
+ */
+export const StdSwitch = (props) => {
+	let id = props.id || props.name;
+
+	return <StdSwitchStyle>
+		<input
+			type="checkbox"
+			id={id}
+			name={props.name}
+			checked={props.checked}
+			onChange={event => props.onChange(event)}
+		/>
+		<label htmlFor={id}>{props.label}
+			<span className="toggle--on">{props.on_state || ''}</span>
+			<span className="toggle--off">{props.off_state || ''}</span>
+		</label>
+	</StdSwitchStyle>
+};

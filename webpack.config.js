@@ -28,6 +28,7 @@ module.exports = async (...args) => {
 		},
 		output: {
 			path: path.join(__dirname, './assets/scripts'),
+			publicPath: '/assets/scripts/',
 			filename: '[name].js',
 			chunkFilename: '[name].js'
 		},
@@ -47,7 +48,17 @@ module.exports = async (...args) => {
 							plugins: ['syntax-dynamic-import']
 						}
 					}
-				}
+				},
+				// {
+				// 	test: /\.worker\.js$/,
+				// 	use: {
+				// 		loader: 'worker-loader',
+				// 		options: {
+				// 			publicPath: '/res.php/ef/course_catalog/scripts/',
+				// 			name: '[name].js'
+				// 		}
+				// 	}
+				// }
 			]
 		},
 		resolve: {
@@ -70,6 +81,7 @@ module.exports = async (...args) => {
 			},
 			runtimeChunk: 'single'
 		},
+		devtool: 'none',
 		plugins: [
 			new webpack.DefinePlugin(env_vars),
 			process.env.NODE_ENV === 'production' ?

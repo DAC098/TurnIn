@@ -1,5 +1,6 @@
 import {
-	REQUEST_USER_LIST,
+	REQUEST_USER_DATA,
+	REQUEST_USER_LIST, RESPONSE_USER_DATA,
 	RESPONSE_USER_LIST
 } from '../actions/users';
 
@@ -7,9 +8,17 @@ const initial_state = {
 	req_user_list: {
 		fetching: false,
 		error: false,
-		message: ''
+		message: '',
+		stack: ''
 	},
-	user_list: []
+	user_list: [],
+	req_user_data: {
+		fetching: false,
+		error: false,
+		message: '',
+		stack: ''
+	},
+	user_data: null
 };
 
 const usersReducer = (state = initial_state,action) => {
@@ -20,7 +29,8 @@ const usersReducer = (state = initial_state,action) => {
 				req_user_list: {
 					fetching: true,
 					error: false,
-					message: ''
+					message: '',
+					stack: ''
 				}
 			};
 		case RESPONSE_USER_LIST:
@@ -29,9 +39,31 @@ const usersReducer = (state = initial_state,action) => {
 				req_user_list: {
 					fetching: false,
 					error: action.err,
-					message: action.msg
+					message: action.msg,
+					stack: action.stack
 				},
-				user_list: action.err ? state.user_list : action.data.result
+				user_list: action.err ? state.user_list : action.data
+			};
+		case REQUEST_USER_DATA:
+			return {
+				...state,
+				req_user_data: {
+					fetching: true,
+					error: false,
+					message: '',
+					stack: ''
+				}
+			};
+		case RESPONSE_USER_DATA:
+			return {
+				...state,
+				req_user_data: {
+					fetching: false,
+					error: action.err,
+					message: action.msg,
+					stack: action.stack
+				},
+				user_data: action.err ? state.user_data : action.data
 			};
 		default:
 			return state;

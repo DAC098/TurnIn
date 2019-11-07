@@ -9,9 +9,10 @@ export const requestSectionList = () => ({
 
 export const responseSectionList = (err,msg,data) => ({
 	type: RESPONSE_SECTION_LIST,
-	err: !!err,
+	err: err,
 	msg,
-	data
+	stack: err ? data : '',
+	data: err ? null : data
 });
 
 export const getSectionList = () => async dispatch => {
@@ -25,7 +26,7 @@ export const getSectionList = () => async dispatch => {
 		if(res.status === 200) {
 			dispatch(responseSectionList(false,'',json.result));
 		} else {
-			dispatch(responseSectionList(true,json.message));
+			dispatch(responseSectionList(true,json.message,json.stack || ''));
 		}
 	} catch(err) {
 		dispatch(responseSectionList(true,err.message));

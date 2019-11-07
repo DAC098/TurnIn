@@ -3,25 +3,25 @@ import {connect} from 'react-redux';
 
 import {getSectionList} from '../actions/sections';
 
-import Modal from './Modal';
 import {IconButton} from '../components/Buttons';
 import Icon from '../components/Icon';
+import ReqResultModal from '../components/ReqResultModal';
 
-class SectionListBase extends Component {
+class SectionList extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			view_error_modal: false
+			view_error_modal: false,
+			fetching: false
 		};
 	}
 
-	getSnapshotBeforeUpdate(prev_props,prev_state) {
-		if(prev_props.req.fetching !== this.props.req.fetching) {
-			if(this.props.req.error) {
-				return {
-					show_error_modal: true
-				}
+	static getDerivedStateFromProps(props,state) {
+		if(props.req.fetching !== state.fetching) {
+			return {
+				fetching: props.req.fetching,
+				view_error_modal: props.req.error
 			}
 		}
 
@@ -30,16 +30,6 @@ class SectionListBase extends Component {
 
 	componentDidMount() {
 		this.props.getSectionList();
-	}
-
-	componentDidUpdate(prev_props,prev_state,snapshot) {
-		if(snapshot) {
-			if(snapshot.show_error_modal) {
-				this.setState(() => ({
-					view_error_modal: true
-				}));
-			}
-		}
 	}
 
 	hideErrorModal() {
@@ -76,18 +66,18 @@ class SectionListBase extends Component {
 			<div>
 				<h4>
 					<span>Sections</span>
-					<IconButton onClick={() => this.props.getSectionList()}>
+					<IconButton disabled={this.state.fetching} onClick={() => this.props.getSectionList()}>
 						<Icon>refresh</Icon>
 					</IconButton>
 				</h4>
 				{this.state.view_error_modal ?
-					<Modal>
-						<IconButton onClick={() => this.hideErrorModal()}>
-							<Icon>close</Icon>
-						</IconButton>
-						<span>there was a problem getting the section list</span>
-						<p>{this.props.req.message}</p>
-					</Modal>
+					<ReqResultModal
+						title={'there was a problem getting the section list'}
+						error={this.props.req.error}
+						stack={this.props.req.stack}
+						message={this.props.req.message}
+						onClose={() => this.hideErrorModal()}
+					/>
 					:
 					null
 				}
@@ -109,7 +99,7 @@ class SectionListBase extends Component {
 	}
 }
 
-const SectionList = connect(
+export default connect(
 	state => ({
 		req: state.sections.req_section_list,
 		list: state.sections.section_list
@@ -117,6 +107,4 @@ const SectionList = connect(
 	dispatch => ({
 		getSectionList: () => dispatch(getSectionList())
 	})
-)(SectionListBase);
-
-export default SectionList;
+)(SectionList);

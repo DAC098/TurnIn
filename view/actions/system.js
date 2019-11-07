@@ -7,10 +7,11 @@ export const requestCloseServer = () => ({
 	type: REQUEST_CLOSE_SERVER
 });
 
-export const responseCloseServer = (err,data) => ({
+export const responseCloseServer = (err,msg,stack) => ({
 	type: RESPONSE_CLOSE_SERVER,
-	err: !!err,
-	data
+	err: err,
+	msg,
+	stack: stack || ''
 });
 
 export const closeServer = (force,test) => async dispatch => {
@@ -32,9 +33,9 @@ export const closeServer = (force,test) => async dispatch => {
 		console.log('response from server',res,json);
 
 		if(res.status === 202) {
-			dispatch(responseCloseServer(null,json.message));
+			dispatch(responseCloseServer(false,json.message));
 		} else {
-			dispatch(responseCloseServer(true,json.message));
+			dispatch(responseCloseServer(true,json.message,json.stack || ''));
 		}
 	} catch(err) {
 		dispatch(responseCloseServer(true,err.message));
