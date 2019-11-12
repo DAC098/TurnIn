@@ -1,44 +1,27 @@
 import logger from './logger';
-import setup, {loadEtc, processCliArgs, checkDirectories} from "../modules/setup";
-import {default as startup} from "../modules/startup"
 
-process.on('exit',code => {
-	logger.warn('process exiting. code:',code);
-});
-
-process.on('uncaughtException',err => {
-	logger.error(err.stack);
-	process.exit();
+process.on('exit',(code) => {
+	if (code !== 0) {
+		logger.warn('process exiting. code:',code);
+	}
 });
 
 async function main() {
-	logger.info("initializing setup");
+	logger.info("loading setup");
 
-	logger.info("loading etc");
+	const setup = (await import("./setup")).default;
 
-	await loadEtc(setup);
-
-	logger.info("processing cli");
-
-	await processCliArgs(setup);
-
-	logger.debug("setup",setup.get());
-
-	// log.info("checking directories");
-
-	// await checkDirectories(setup);
-
+	logger.info("loading server");
+	
 	const server = (await import("./server")).default;
 
-	// const loadRoutes = require('./load_routes');
+	logger.info("loading database");
 
-	// log.info('loading routes');
-	
-	// loadRoutes();
+	await import("./db");
 
-	// log.info('creating server');
-	
-	// server.create();
+	logger.info("loading addons");
+
+	await (await import("./addonLoader")).default();
 
 	logger.info('opening server for connections');
 

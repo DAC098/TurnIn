@@ -10,7 +10,6 @@
 			"name": "http2 server",
 			"console": "integratedTerminal",
 			"program": "${workspaceFolder}\\dist\\server\\index.js",
-			"preLaunchTask": "tsc: build - tsconfig.json",
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
 			],

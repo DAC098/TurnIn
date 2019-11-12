@@ -14,8 +14,6 @@
             "classnames",
             "styled-components"
         ],
-        "baseUrl": "src",
-        "paths": {},
 		"allowSyntheticDefaultImports": true
     },
     "include": [

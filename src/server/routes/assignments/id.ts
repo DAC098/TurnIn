@@ -1,15 +1,15 @@
 import * as nPath from 'path';
 
 import {default as db} from "../../../modules/psql"
-import setup from '../../../modules/setup';
+// import setup from '../../../modules/setup';
 
 import isJsonContent from '../../../modules/middleware/isJsonContent';
 import * as parser from '../../../modules/parser';
 import Dir from '../../../lib/fs/Dir';
 import {default as log} from "../../logger"
 
-import {AppRoutesArray} from "../../../modules/types/Routing";
 import {AssignmentIDPutJSON} from "../../../modules/types/JSONS"
+import { AppRouteList } from '../../../server/router';
 
 const id_assignment_path = '/:id([0-9]+)';
 
@@ -17,7 +17,8 @@ interface AssignmentIdParams {
 	id: string
 };
 
-const routes: AppRoutesArray<AssignmentIdParams> = [
+/*
+const routes: AppRouteList = [
 	[
 		{
 			path: id_assignment_path,
@@ -142,3 +143,4 @@ const routes: AppRoutesArray<AssignmentIdParams> = [
 ];
 
 export default routes;
+*/

@@ -1,4 +1,4 @@
-import * as PSQL from 'pg';
+import PSQL from 'pg';
 import {default as _} from "lodash"
 
 import SQLConnection from './SQLConnection';

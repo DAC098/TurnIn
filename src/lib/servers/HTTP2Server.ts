@@ -1,5 +1,6 @@
 import * as HTTP2 from "http2";
 import { EventEmitter } from "events";
+import { TLSSocket } from "tls";
 
 export interface Options {
 	secure?: boolean
@@ -36,8 +37,14 @@ declare interface HTTP2Server extends EventEmitter {
 	on(event: "listening", cb: () => void): this,
 	once(event: "listening", cb: () => void): this,
 
-	on(event: "unknownProtocol", cb: () => void): this,
-	once(event: "unknownProtocol", cb: () => void): this,
+	on(event: "unknownProtocol", cb: (socket: TLSSocket) => void): this,
+	once(event: "unknownProtocol", cb: (socket: TLSSocket) => void): this,
+
+	on(event: "newListener", cb: (event: string, listener: (...args: any[]) => void) => void): this,
+	once(event: "newListener", cb: (event: string, listener: (...args: any[]) => void) => void): this
+
+	on(event: "removeListener", cb: (event: string, listener: (...args:any[]) => void) => void): this,
+	once(event: "removeListener", cb: (event: string, listener: (...args:any[]) => void) => void): this,
 }
 
 class HTTP2Server extends EventEmitter {
@@ -50,6 +57,7 @@ class HTTP2Server extends EventEmitter {
 	private instance: ServerInstance;
 	
 	private open: boolean = false;
+	private closing: boolean = false;
 
 	constructor(server_options: ServerOptions, options: Options) {
 		super();
@@ -91,12 +99,35 @@ class HTTP2Server extends EventEmitter {
 		this.instance.on("stream", (stream,headers,flags) => this.emit("stream",stream,headers,flags));
 		this.instance.on("timeout",() => this.emit("timeout"));
 
+		if (options.secure) {
+			let unknownProtocol_count = 0;
+			const unknownProtocolListener = (soc) => this.emit("unknownProtocol", soc);
+
+			this.on("newListener", (event,listener) => {
+				if (event === "unknownProtocol") {
+					if (++unknownProtocol_count === 1) {
+						this.instance.on("unknownProtocol", unknownProtocolListener);
+					}
+				}
+			});
+
+			this.on("removeListener", (event, listener) => {
+				if (event === "unknownProtocol") {
+					if (--unknownProtocol_count === 0) {
+						this.instance.removeListener("unknownProtocol", unknownProtocolListener);
+					}
+				}
+			});
+		}
+
 		this.instance.on("listening", () => {
 			this.open = true;
 		});
 
 		this.instance.on("close", () => {
 			this.open = false;
+			this.closing = false;
+
 			this.emit("close");
 		});
 
@@ -111,6 +142,14 @@ class HTTP2Server extends EventEmitter {
 		}
 	}
 
+	public isOpen() {
+		return this.open;
+	}
+
+	public isClosing() {
+		return this.closing;
+	}
+
 	public totalSessions() {
 		return this.active_sessions_count;
 	}
@@ -120,13 +159,13 @@ class HTTP2Server extends EventEmitter {
 	}
 
 	public closeSessions() {
-		return new Promise(resolve => {
+		return new Promise<void>(resolve => {
 			let count = 0;
 
 			for (let session of this.getSessions()) {
 				++count;
 
-				session.on("close", () => {
+				session.once("close", () => {
 					if (count == 0) {
 						resolve();
 					}
@@ -137,26 +176,43 @@ class HTTP2Server extends EventEmitter {
 		});
 	}
 
-	public close() {
-		return new Promise((resolve,reject) => {
-			this.instance.close(err => {
-				if (err) {
-					reject(err);
-				}
-				else {
-					resolve();
-				}
-			});
+	public close(wait_for_close: boolean = true) {
+		return new Promise<void>((resolve,reject) => {
+			this.closing = true;
+
+			if (wait_for_close) {
+				this.instance.close(err => {
+					if (err) {
+						reject(err);
+					}
+					else {
+						resolve();
+					}
+				});
+			}
+			else {
+				this.instance.close();
+				resolve();
+			}
 		});
 	}
 
-	public async shutdown() {
-		await this.closeSessions();
-		await this.close();
+	public shutdown() {
+		return new Promise<void>(async (resolve,reject) => {
+			this.close()
+				.then(() => {
+					resolve();
+				})
+				.catch(err => {
+					reject(err);
+				});
+
+			await this.closeSessions();
+		});
 	}
 
 	public listen(port?: number, host?: string, backlog?: number) {
-		return new Promise(resolve => {
+		return new Promise<void>(resolve => {
 			this.instance.listen(port, host, backlog, () => {
 				resolve();
 			});
@@ -165,6 +221,14 @@ class HTTP2Server extends EventEmitter {
 
 	public address() {
 		return this.instance.address();
+	}
+
+	public setTimeout(msec?: number) {
+		return new Promise<void>((resolve) => {
+			this.instance.setTimeout(msec, () => {
+				resolve();
+			});
+		});
 	}
 }
 

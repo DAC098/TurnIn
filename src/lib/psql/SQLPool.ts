@@ -4,9 +4,9 @@ import {default as _} from "lodash"
 import SQLWrapper from './SQLWrapper';
 
 interface IntervalTime {
-	hours: number,
-	minutes: number,
-	seconds: number
+	hours?: number,
+	minutes?: number,
+	seconds?: number
 };
 
 const default_interval_time = {
@@ -38,11 +38,11 @@ export default class SQLPool {
 	private common_connection: PoolConfig;
 	private options: SQLPoolOptions
 
-	constructor(interval_time, common_connection, options) {
+	constructor(interval_time?: IntervalTime, common_connection?: PoolConfig, options?: SQLPoolOptions) {
 		this.connections = new Map();
 		this.interval = null;
 		this.interval_time = _.merge({},default_interval_time,interval_time);
-		this.common_connection = _.clone(common_connection);
+		this.common_connection = _.merge({},common_connection);
 		this.options = _.merge({},default_options,options);
 
 		if(this.options.create_default)
@@ -55,9 +55,27 @@ export default class SQLPool {
 	}
 
 	getIntervalTime() {
-		return (1000 * (this.interval_time.seconds > 60 ? 60 : this.interval_time.seconds)) +
-		       (60000 * (this.interval_time.minutes > 60 ? 60 : this.interval_time.minutes)) +
-		       (3600000 * (this.interval_time.hours > 24 ? 24 : this.interval_time.hours));
+		let seconds = 0;
+		let minutes = 0;
+		let hours = 0;
+
+		if (this.interval_time.seconds != null && this.interval_time.seconds >= 0) {
+			seconds = this.interval_time.seconds;
+		}
+		
+		if (this.interval_time.minutes != null && this.interval_time.minutes >= 0) {
+			minutes = this.interval_time.minutes;
+		}
+
+		if (this.interval_time.hours != null && this.interval_time >= 0) {
+			hours = this.interval_time.hours;
+		}
+
+		let time = (1000 * (seconds > 60 ? 60 : seconds)) +
+			(60000 * (minutes > 60 ? 60 : minutes)) +
+			(3600000 * (hours > 24 ? 24 : hours));
+		
+		return time;
 	}
 
 	checkPools() {
@@ -124,7 +142,7 @@ export default class SQLPool {
 		}
 	}
 	
-	updatePool(name): boolean {
+	updatePool(name: string): boolean {
 		let conn = this.connections.get(name);
 
 		if(conn) {
@@ -136,7 +154,7 @@ export default class SQLPool {
 		}
 	}
 	
-	async connect(name) {
+	async connect(name: string) {
 		let pool = this.getPool(name);
 
 		if(pool !== null) {
@@ -146,11 +164,11 @@ export default class SQLPool {
 		}
 	}
 
-	setCommonConnection(common) {
+	setCommonConnection(common: PoolConfig) {
 		this.common_connection = _.clone(common);
 	}
 
-	setDefaultOptions(options) {
+	setDefaultOptions(options: SQLPoolOptions) {
 		this.options = _.merge({},this.options,options);
 	}
 }

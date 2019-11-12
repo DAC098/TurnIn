@@ -1,28 +1,16 @@
-import Router from 'Router';
-import {default as global} from "Router/global"
+import Router, {Callback, RouteOptions} from "Router";
+import { ServerHttp2Stream, IncomingHttpHeaders } from "http2";
+import { URL } from "url";
 
-import {AppRouter} from "../modules/types/Routing";
+export interface AdditionalData {
+	url: URL
+}
 
-// global.on('endpoint', (...args) => {
-//   console.log('endpoint:',...args);
-// });
-//
-// global.on('middleware', (...args) => {
-//   console.log('middleware:',...args);
-// });
-//
-// global.on('mount', (...args) => {
-//   console.log('mount:',...args);
-// });
-//
-// global.on('addRoute',(...args) => {
-//   console.log('addRoute:',...args);
-// });
-//
-// global.on('addMount',(...args) => {
-//   console.log('addMount:',...args);
-// });
+export type AppRouterArgs = [ServerHttp2Stream, IncomingHttpHeaders, number, AdditionalData];
+export type AppRouter = Router<AppRouterArgs>;
+export type AppRouterCallback = Callback<AppRouterArgs>;
+export type AppRouteList = [RouteOptions, ...AppRouterCallback[]][]
 
-const router: AppRouter = new Router({name: '/'});
+const router: AppRouter = new Router<AppRouterArgs>({name: '/'});
 
 export default router;

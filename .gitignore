@@ -2,6 +2,7 @@
 ignore
 assets/scripts
 third_party/*/
+dist
 
 # files
 *.ignore*
