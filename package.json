@@ -22,10 +22,6 @@
     "react-motion": "^0.5.2",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
-    "redis": "^2.8.0",
-    "router": "git+https://github.com/dac098/Router.git",
-    "socket.io": "^2.1.0",
-    "socket.io-client": "^2.1.0",
     "styled-components": "^4.3.2",
     "tar": "^4.4.10",
     "uuid": "^3.3.2"
