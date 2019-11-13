@@ -1,12 +1,13 @@
-import File from "../lib/fs/File";
-import HTTP2Server from "../lib/servers/HTTP2Server";
+import {default as nFS} from "fs";
+import { URL } from "url";
+import { constants } from "http2";
+
+import HTTP2Server from "app/lib/servers/HTTP2Server";
+import { existsSync } from "app/lib/fs/common";
 
 import setup from "./setup";
 import logger from "./logger";
 import router from "./router";
-
-import { URL } from "url";
-import { constants } from "http2";
 
 function wait(msec: number) {
 	return new Promise(resolve => {
@@ -23,18 +24,18 @@ if (secure_server) {
 	let key_file = setup.getKey("tls.key");
 	let cert_file = setup.getKey("tls.cert");
 
-	if (!File.existsSync(key_file)) {
+	if (!existsSync(key_file,"file")) {
 		throw new Error(`tls.key not found. file: "${key_file}"`);
 	}
 	else {
-		opts["key"] = File.readSync(key_file);
+		opts["key"] = nFS.readFileSync(key_file);
 	}
 
-	if (!File.existsSync(cert_file)) {
+	if (!existsSync(cert_file,"file")) {
 		throw new Error(`tls.cert not found. file: "${cert_file}"`);
 	}
 	else {
-		opts["cert"] = File.readSync(cert_file);
+		opts["cert"] = nFS.readFileSync(cert_file);
 	}
 }
 

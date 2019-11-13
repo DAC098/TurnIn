@@ -1,6 +1,7 @@
 const order = [
 	"file_serving",
-	"server"
+	"server_interface",
+	"root.js"
 ];
 
 export default order;

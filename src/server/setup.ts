@@ -1,8 +1,8 @@
 import * as nPath from 'path';
+import {default as nFS} from "fs";
 
 import Setup from '../lib/Setup';
-import File from '../lib/fs/File';
-import Dir from '../lib/fs/Dir';
+import { exists, makeDir, loadYamlSync, existsSync } from 'app/lib/fs/common';
 
 const traverseKeys = (obj: object): Map<string,any> => {
 	let rtn = new Map<string,any>();
@@ -104,8 +104,8 @@ const setup = new Setup<SetupObject>(default_setup);
 
 let set_keys = new Set<string>();
 
-if(File.existsSync('/etc/turnin/config.yaml')) {
-	let data = File.loadYamlSync('/etc/turnin/config.yaml');
+if(existsSync('/etc/turnin/config.yaml',"file")) {
+	let data = loadYamlSync('/etc/turnin/config.yaml');
 
 	let keys = traverseKeys(data);
 
@@ -132,23 +132,23 @@ for(let i = 1,l = process.argv.length; i < l; ++i) {
 				let file_data = {};
 				++i;
 
-				if(!File.existsSync(file_path)) {
+				if(!existsSync(file_path,"file")) {
 					throw new Error(`config file not found. ${file_path}`);
 				}
 
 				switch(nPath.extname(file_path)) {
 					case ".yaml":
 					case ".yml":
-						file_data = File.loadYamlSync(file_path);
+						file_data = loadYamlSync(file_path);
 						break;
 					case ".json":
-						file_data = JSON.parse(<string>File.readSync(file_path));
+						file_data = JSON.parse(nFS.readFileSync(file_path,{encoding:"utf8"}));
 						break;
 				}
 
 				let keys = traverseKeys(file_data);
 
-				for(let [k,v] of keys) {
+				for (let [k,v] of keys) {
 					setup.setKey(k,v);
 				}
 			}
@@ -168,8 +168,8 @@ const checkDirectories = async (given_setup: Setup<any>) => {
 	}
 	
 	for(let dir of checking) {
-		if(!await Dir.exists(nPath.join(data_dir,dir))) {
-			await Dir.make(nPath.join(data_dir,dir));
+		if(!await exists(nPath.join(data_dir,dir),"dir")) {
+			await makeDir(nPath.join(data_dir,dir));
 		}
 	}
 };

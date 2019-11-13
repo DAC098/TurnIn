@@ -1,4 +1,12 @@
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+import importer from "app/lib/importer";
+
 import logger from './logger';
+import {default as route_load_order} from "./routes/order";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 process.on('exit',(code) => {
 	if (code !== 0) {
@@ -19,9 +27,9 @@ async function main() {
 
 	await import("./db");
 
-	// logger.info("loading addons");
+	logger.info("loading routes");
 
-	// await (await import("./addonLoader")).default();
+	await importer(join(__dirname,"routes"), route_load_order);
 
 	logger.info('opening server for connections');
 
@@ -47,5 +55,5 @@ async function main() {
 }
 
 main().catch(err => {
-	logger.error(`${err.stack}`);
+	logger.error(err.stack);
 });

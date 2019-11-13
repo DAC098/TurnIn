@@ -4,9 +4,9 @@ import { constants } from "http2";
 
 import mime from "mime";
 
-import asyncPump from "../../../lib/streaming/asyncPump";
-import {default as FSFile} from "../../../lib/fs/File";
-import json from "../../../lib/servers/response/json";
+import asyncPump from "app/lib/streaming/asyncPump";
+import json from "app/lib/servers/response/json";
+import { exists } from "app/lib/fs/common";
 
 import logger from "../../logger";
 import router from "../../router";
@@ -20,7 +20,7 @@ router.addRoute({
 	let current_url = route_data.getURL();
 	let file_path = path.join(cwd,current_url.pathname);
 
-	if (await FSFile.exists(file_path)) {
+	if (await exists(file_path,"file")) {
 		stream.respond({
 			":status": 200,
 			"content-type": mime.getType(path.extname(file_path))

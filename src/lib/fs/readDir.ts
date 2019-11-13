@@ -1,18 +1,9 @@
-import {default as nFS} from 'fs';
-import {default as nPath} from "path"
-import {default as nUtil} from "util"
+import {default as nFS, readdir} from "fs";
+import {default as nPath} from "path";
 
-import merge from 'lodash/merge';
-import reverse from 'lodash/reverse';
+import merge from "lodash/merge";
 
-import * as common from './common';
-import File from'./File';
-
-const nLStat = nFS.promises.lstat;
-
-const nReadDir = nFS.promises.readdir;
-const nMkDir = nFS.promises.mkdir;
-const nRmDir = nFS.promises.rmdir;
+import {runCheck} from "./common";
 
 export interface ReadOptions {
 	ignore?: Array<string>,
@@ -78,13 +69,13 @@ async function rRead(path: string, opt: ReadOptions): Promise<ReadResult> {
 		files: [],
 		directories: []
 	};
-	let contents = await nReadDir(path);
+	let contents = await nFS.promises.readdir(path);
 
 	for(let item of contents) {
 		let item_path = nPath.join(path,item);
-		let stats = await nLStat(item_path);
+		let stats = await nFS.promises.stat(item_path);
 
-		if(!common.runCheck(item_path,opt.ignore)) {
+		if(!runCheck(item_path,opt.ignore)) {
 			if(stats.isDirectory()) {
 				if(opt.depth !== 0) {
 					--opt.depth;
@@ -144,7 +135,7 @@ function rReadSync(path: string,opt: ReadOptions): ReadResult {
 		let item_path = nPath.join(path,item);
 		let stats = nFS.lstatSync(item_path);
 
-		if(!common.runCheck(item_path,opt.ignore)) {
+		if(!runCheck(item_path,opt.ignore)) {
 			if(stats.isDirectory()) {
 				if(opt.depth !== 0) {
 					--opt.depth;
@@ -193,88 +184,14 @@ function rReadSync(path: string,opt: ReadOptions): ReadResult {
 	return found;
 }
 
-export default class Dir {
-	constructor() {}
-	
-	static async exists(path: nFS.PathLike): Promise<boolean> {
-		try {
-			let stats = await nLStat(path);
+export async function readDir(path: string, opt: ReadOptions = {}) {
+	opt = merge({},read_default,opt);
 
-			return stats.isDirectory();
-		} catch(err) {
-			return false;
-		}
-	}
-	
-	static existsSyc(path: nFS.PathLike): boolean {
-		try {
-			let stats = nFS.lstatSync(path);
+	return await rRead(path,opt);
+}
 
-			return stats.isDirectory();
-		} catch (err) {
-			return false;
-		}
-	}
-	
-	static async read(path: string, opt: ReadOptions = {}): Promise<ReadResult> {
-		opt = merge({},read_default,opt);
+export function readDirSync(path: string, opt: ReadOptions = {}) {
+	opt = merge({},read_default,opt);
 
-		return await rRead(path,opt);
-	}
-	
-	static readSync(path: string, opt: ReadOptions = {}): ReadResult {
-		opt = merge({},read_default,opt);
-
-		return rReadSync(path,opt);
-	}
-	
-	static async make(path: string | string[], mode?: string | number | nFS.MakeDirectoryOptions): Promise<void> {
-		if(Array.isArray(path)) {
-			path = nPath.join(...path);
-		}
-
-		let parse = nPath.parse(path);
-		let check = parse.root;
-		let parts = nPath.join(parse.dir.replace(parse.root,''),parse.base).split(nPath.sep);
-
-		for(let part of parts) {
-			check = nPath.join(check,part);
-
-			if(!await Dir.exists(check)) {
-				await nMkDir(check,mode);
-			}
-		}
-	}
-	
-	static makeSync(path: string, mode?: string | number | nFS.MakeDirectoryOptions): void {
-		let parse = nPath.parse(path);
-		let check = parse.root;
-		let parts = nPath.join(parse.dir.replace(parse.root,''),parse.base).split(nPath.sep);
-
-		for(let part of parts) {
-			check = nPath.join(check,part);
-
-			if(!Dir.existsSyc(check)){
-				nFS.mkdirSync(check,mode);
-			}
-		}
-	}
-	
-	static async remove(path: string, rm_files: boolean = false): Promise<boolean> {
-		let contents = (await Dir.read(path,{depth:-1}) as ReadResultObjectTmplt<string>);
-
-		if(contents.files.length !== 0 && !rm_files)
-			return false;
-		else {
-			for(let file of contents.files) {
-				await File.remove(file)
-			}
-
-			for(let dir of reverse(contents.directories)) {
-				await nRmDir(dir);
-			}
-
-			await nRmDir(path);
-		}
-	}
+	return rReadSync(path, opt);
 }

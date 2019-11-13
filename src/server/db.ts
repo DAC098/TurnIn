@@ -2,10 +2,10 @@ import "reflect-metadata";
 import typeorm from "typeorm";
 
 import setup from "./setup";
-import { 
-	User, 
-	Section, 
-	Enrollment 
+import {
+	User,
+	Section,
+	Enrollment
 } from "app/entities";
 import logger from "./logger";
 
@@ -53,7 +53,7 @@ typeorm.createConnection({
 	subscribers: [],
 	synchronize: true,
 	dropSchema: true,
-	logging: true,
+	logging: false,
 	namingStrategy: new NamingStrat()
 }).catch(err => {
 	logger.error(err.stack);
