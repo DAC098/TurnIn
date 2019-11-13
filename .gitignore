@@ -8,6 +8,8 @@ dist/*
 
 # files
 *.ignore*
+config.yaml
+config.yml
 
 # ide
 .idea

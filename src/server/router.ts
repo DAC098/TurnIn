@@ -1,4 +1,4 @@
-import Router, {Callback, RouteOptions} from "Router";
+import Router, {Callback, RouteOptions} from "router";
 import { ServerHttp2Stream, IncomingHttpHeaders } from "http2";
 import { URL } from "url";
 

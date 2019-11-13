@@ -1,4 +1,4 @@
-import Router from "Router";
+import Router from "router";
 import { AppRouterArgs } from "../../router";
 
 const server_router = new Router<AppRouterArgs>();
