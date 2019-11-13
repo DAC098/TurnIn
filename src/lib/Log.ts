@@ -42,7 +42,7 @@ export default class Log {
 	private parent: Log | null;
 
 	constructor(id:string = '', name:string|string[] = '', options:LogOptions = {}) {
-		let p = Log.parseName(name);
+		let p = Log.parseName(id,name);
 
 		options = _.merge({},default_options, options);
 
@@ -76,12 +76,16 @@ export default class Log {
 		}
 	}
 
-	static parseName(name: string|string[]) {
+	static parseName(id: string, name: string|string[]) {
 		let rtn = {
 			has_name : false,
 			name_list: [],
 			name     : ''
 		};
+
+		if (name.length === 0) {
+			name = id;
+		}
 
 		if(typeof name[Symbol.iterator] === 'function' && typeof name !== 'string') {
 			let t_name = [];
@@ -106,8 +110,8 @@ export default class Log {
 		return rtn;
 	}
 
-	static createChild(parent: Log, id:string = '', name:string|string[] = '', options:LogOptions = {}) {
-		let p      = Log.parseName(name);
+	static createChild(parent: Log, id:string, name: string|string[] = '', options:LogOptions = {}) {
+		let p      = Log.parseName(id, name);
 		let t_name = [];
 
 		if(parent.has_name)
@@ -125,14 +129,14 @@ export default class Log {
 		       && this.parent ? this.parent.enabled : true);
 	}
 
-	extend(id = '', name = '', options) {
+	extend(id:string, name: string = '', options?: LogOptions) {
 		if(id in this.children)
 			return this.children[id];
 
 		return Log.createChild(this, id, name, options);
 	}
 
-	extendChild(path, id = '', name = '', options) {
+	extendChild(path: string, id: string, name: string = '', options?: LogOptions) {
 		let parent: Log = this;
 		let dot_path = path.split('.');
 
@@ -153,7 +157,7 @@ export default class Log {
 	}
 
 	setName(name: string|string[]) {
-		let p = Log.parseName(name);
+		let p = Log.parseName(this.id, name);
 
 		this.has_name = p.has_name;
 		this.name_list = p.name_list;

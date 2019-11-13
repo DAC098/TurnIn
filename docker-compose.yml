@@ -1,5 +1,5 @@
 ---
-version: "3"
+version: "3.1"
 
 services:
   # asset-bundle:
@@ -10,50 +10,11 @@ services:
   #   environment:
   #     - "NODE_ENV=development"
   #   command: "./node_modules/.bin/webpack --config webpack.config.js --watch"
-  # server:
-  #   image: "node:10.0.0"
-  #   depends_on:
-  #     - redis
-  #     - psql
-  #   volumes:
-  #     - "./:/app"
-  #     - "../_configs/turnin:/etc/turnin"
-  #     - "../_data/turnin:/var/lib/turnin/data"
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   working_dir: "/app"
-  #   environment:
-  #     - "NODE_ENV=development"
-  #   ports:
-  #     - "443:443"
-  #   restart: unless-stopped
-  #   command: "node ./server/index.js --c-psql.hostname psql --c-redis.hostname redis"
-  # worker:
-  #   image: "node:10.0.0"
-  #   depends_on:
-  #     - redis
-  #     - psql
-  #   volumes:
-  #     - "./:/app"
-  #     - "../_configs/turnin:/etc/turnin"
-  #     - "../_data/turnin:/var/lib/turnin/data"
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   working_dir: "/app"
-  #   environment:
-  #     - "NODE_ENV=development"
-  #   expose:
-  #     - "443"
-  #   restart: "unless-stopped"
-  #   command: "node ./worker/index.js --c-psql.hostname psql --c-redis.hostname redis"
-  # redis:
-  #   image: "redis:4.0.6"
-  #   expose:
-  #     - "6379"
-  #   restart: unless-stopped
   psql:
-    build: ./psql/
+    image: "postgres:11.0"
     environment:
       POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "turnin"
     ports:
       - "5432:5432"
-
 ...

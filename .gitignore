@@ -2,7 +2,9 @@
 ignore
 assets/scripts
 third_party/*/
-dist
+
+dist/*
+!dist/package.json
 
 # files
 *.ignore*

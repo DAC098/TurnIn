@@ -1,5 +1,5 @@
-import Log from "../lib/Log";
+import {default as app_logger} from "app/logger";
 
-const logger = new Log("main","server");
+const logger = app_logger.extend("server");
 
 export default logger;

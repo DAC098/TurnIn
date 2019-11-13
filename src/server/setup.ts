@@ -48,7 +48,8 @@ interface SetupObject {
 		hostname: string,
 		port: number,
 		username: string,
-		password: string
+		password: string,
+		database: string
 	},
 	security?: {
 		secret: string
@@ -82,8 +83,9 @@ const default_setup: SetupObject = {
 	psql: {
 		hostname: '127.0.0.1',
 		port: 5432,
-		username: 'turnin',
-		password: 'turnin_password'
+		username: 'postgres',
+		password: 'password',
+		database: "postgres"
 	},
 	security: {
 		secret: 'secret'

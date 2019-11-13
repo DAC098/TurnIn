@@ -19,9 +19,9 @@ async function main() {
 
 	await import("./db");
 
-	logger.info("loading addons");
+	// logger.info("loading addons");
 
-	await (await import("./addonLoader")).default();
+	// await (await import("./addonLoader")).default();
 
 	logger.info('opening server for connections');
 
@@ -47,5 +47,5 @@ async function main() {
 }
 
 main().catch(err => {
-	logger.error(`${err.message}`);
+	logger.error(`${err.stack}`);
 });

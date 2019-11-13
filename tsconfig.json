@@ -13,8 +13,14 @@
             "react-dom",
             "classnames",
             "styled-components"
-        ],
-		"allowSyntheticDefaultImports": true
+		],
+		"baseUrl": ".",
+		"paths": {
+			"app/*": ["src/*"]
+		},
+		"allowSyntheticDefaultImports": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true
     },
     "include": [
 		"src"

@@ -2,9 +2,9 @@
   "name": "turnin",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "dependencies": {
     "Router": "git+https://github.com/dac098/Router.git",
+    "app": "file:dist",
     "casbin": "^3.0.6",
     "chalk": "^2.4.2",
     "classnames": "^2.2.6",
@@ -22,8 +22,10 @@
     "react-motion": "^0.5.2",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
+    "reflect-metadata": "^0.1.13",
     "styled-components": "^4.3.2",
     "tar": "^4.4.10",
+    "typeorm": "^0.2.20",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -50,7 +52,7 @@
     "webpack-manifest-plugin": "^2.0.4"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docker-psql": "docker run -it --rm --network turnin_default postgres psql -h psql -U postgres turnin"
   },
   "repository": {
     "type": "git",
