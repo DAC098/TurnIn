@@ -25,6 +25,7 @@
 				"${workspaceFolder}\\config.yml"
 			],
 			"runtimeArgs": [
+				"--enable-source-maps",
 				"--experimental-modules",
 				"--es-module-specifier-resolution",
 				"node"

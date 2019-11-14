@@ -1,28 +1,23 @@
-const parseText = (stream:any): Promise<string> => new Promise((resolve,reject) => {
+const parseText = (stream: NodeJS.ReadableStream) => new Promise<string>((resolve,reject) => {
 	if(stream.readable) {
-		let body = '';
-
-		stream.on('data', chunk => {
-			body += chunk;
-		});
-
-		stream.on('end', () => {
-			try {
-				if(body.length)
-					resolve(body);
-				else
-					resolve('');
-			} catch(err) {
-				reject(err);
-			}
-		});
-
-		stream.on('error', err => {
+		const error_handle = err => {
 			reject(err);
-		});
+		}
 
-		if(stream.isPaused())
-			stream.resume();
+		stream.once("error", error_handle);
+
+		stream.once("readable", () => {
+			let data = "";
+			let chunk = null;
+
+			while (null != (chunk = stream.read())) {
+				data += chunk;
+			}
+
+			resolve(data);
+
+			stream.removeListener("error", error_handle);
+		});
 	} else {
 		resolve(null);
 	}

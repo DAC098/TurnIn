@@ -4,7 +4,7 @@ interface JsonOptions {
 	headers?: OutgoingHttpHeaders
 }
 
-export default function json(stream: ServerHttp2Stream, status: number, data: any, options: JsonOptions = {}) {
+export default function sendJSON(stream: ServerHttp2Stream, status: number, data: any, options: JsonOptions = {}) {
 	let headers = {};
 
 	if (options.headers != null) {

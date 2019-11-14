@@ -19,6 +19,31 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "webpack-build",
+			"command": "./node_modules/.bin/webpack-cli",
+			"args": [
+				"--config",
+				"webpack.config.js"
+			],
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"type": "shell",
+			"label": "webpack-watch",
+			"command": "./node_modules/.bin/webpack-cli",
+			"args": [
+				"--config",
+				"webpack.config.js",
+				"--watch"
+			],
+			"problemMatcher": [
+				"$tsc"
+			]
 		}
 	]
 }

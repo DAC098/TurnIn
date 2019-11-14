@@ -5,7 +5,7 @@ import { constants } from "http2";
 import mime from "mime";
 
 import asyncPump from "app/lib/streaming/asyncPump";
-import json from "app/lib/servers/response/json";
+import sendJSON from "app/lib/servers/response/json";
 import { exists } from "app/lib/fs/common";
 
 import logger from "../../logger";
@@ -39,6 +39,6 @@ router.addRoute({
 		}
 	}
 	else {
-		json(stream, 404, {message: "file_not_found"});
+		sendJSON(stream, 404, {message: "file_not_found"});
 	}
 });

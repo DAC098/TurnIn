@@ -67,6 +67,8 @@ server.on("session", session => {
 			}
 		});
 
+		logger.debug(`incoming stream: ${method} ${path}`);
+
 		try {
 			let result = await router.run(url,method.toLowerCase(),[stream,headers,flags,{url}]);
 

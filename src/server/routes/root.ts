@@ -26,7 +26,6 @@ const getAppHTML = () => `
 	${head_string}
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
-	${false && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
 	<script type="application/javascript" src="/assets/scripts/app.js"></script>
 	</head>
 	<body>
@@ -44,7 +43,6 @@ const getLoginHTML = () => `
 	${head_string}
 	<script type="application/javascript" src="/assets/scripts/vendor.js"></script>
 	${'common.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/common.js"></script>' : ''}
-	${false && 'dev.js' in manifest ? '<script type="application/javascript" src="/assets/scripts/dev.js"></script>' : ''}
 	<script type="application/javascript" src="/assets/scripts/login.js"></script>
 	</head>
 	<body>

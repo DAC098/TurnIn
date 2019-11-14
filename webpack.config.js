@@ -32,7 +32,7 @@ module.exports = async (...args) => {
 			filename: '[name].js',
 			chunkFilename: '[name].js'
 		},
-		devTool: "none",
+		devtool: "none",
 		module: {
 			rules: [
 				{
@@ -48,17 +48,7 @@ module.exports = async (...args) => {
 							plugins: ['syntax-dynamic-import']
 						}
 					}
-				},
-				// {
-				// 	test: /\.worker\.js$/,
-				// 	use: {
-				// 		loader: 'worker-loader',
-				// 		options: {
-				// 			publicPath: '/res.php/ef/course_catalog/scripts/',
-				// 			name: '[name].js'
-				// 		}
-				// 	}
-				// }
+				}
 			]
 		},
 		resolve: {
