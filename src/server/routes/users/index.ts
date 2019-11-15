@@ -17,6 +17,12 @@ router.addRoute({
 }, async ([stream,headers,flags,data], route_data) => {
 	let user_repo = typeorm.getRepository(User);
 	let user_results = await user_repo.find({
+		relations: [
+			"enrolled",
+			"teaching",
+			"docker_images",
+			"docker_containers"
+		],
 		where: [
 			{id: route_data.params["id"]}
 		]
@@ -36,14 +42,17 @@ router.addRoute({
 	methods: "get"
 }, async ([stream,headers,flags,data], route_data) => {
 	let user = <User>data["user"];
+	let rtn = {};
+	let exclude_keys = ["password","salt"];
 
-	sendJSON(stream,200,{data: {
-		username: user.username,
-		email: user.email,
-		fname: user.fname,
-		lname: user.lname,
-		id: user.id
-	}});
+	for (let key of Object.keys(user)) {
+		if (exclude_keys.includes(key))
+			continue;
+
+		rtn[key] = user[key];
+	}
+
+	sendJSON(stream,200,{data: rtn});
 });
 
 router.addRoute({

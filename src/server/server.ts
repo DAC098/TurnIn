@@ -1,6 +1,7 @@
 import {default as nFS} from "fs";
 import { URL } from "url";
 import { constants } from "http2";
+import { performance } from "perf_hooks";
 
 import HTTP2Server from "app/lib/servers/HTTP2Server";
 import { existsSync } from "app/lib/fs/common";
@@ -70,7 +71,10 @@ server.on("session", session => {
 		logger.debug(`incoming stream: ${method} ${path}`);
 
 		try {
+			let request_start = performance.now();
 			let result = await router.run(url,method.toLowerCase(),[stream,headers,flags,{url}]);
+
+			logger.perf("request time:",performance.now() - request_start,"ms");
 
 			if (!result.found_path) {
 				if (stream.headersSent) {

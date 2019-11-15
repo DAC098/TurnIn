@@ -3,7 +3,7 @@ import typeorm from "typeorm"
 import { Assignment } from "./Assignment";
 import { User } from "./User";
 
-enum Semesters {
+export enum Semesters {
 	SPRING,
 	SUMMER,
 	WINTER,
@@ -47,7 +47,7 @@ export class Section {
 	@typeorm.JoinColumn()
 	teacher: User;
 	
-	@typeorm.ManyToMany("User","id")
+	@typeorm.ManyToMany("User","enrolled")
 	@typeorm.JoinTable({
 		name: "enrollments"
 	})
