@@ -5,6 +5,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome",
+			"url": "https://localhost",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
 			"type": "node",
 			"request": "launch",
 			"name": "http2 server",
@@ -18,6 +25,7 @@
 				"${workspaceFolder}\\config.yml"
 			],
 			"runtimeArgs": [
+				"--enable-source-maps",
 				"--experimental-modules",
 				"--es-module-specifier-resolution",
 				"node"

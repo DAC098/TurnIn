@@ -1,28 +1,33 @@
-const parseJSON = <ReturnJSON = {}>(stream: any): Promise<ReturnJSON|null> => new Promise((resolve,reject) => {
+const parseJSON = <ReturnJSON = {}>(stream: NodeJS.ReadableStream) => new Promise<ReturnJSON|null>((resolve,reject) => {
 	if(stream.readable) {
-		let body = '';
+		const error_handle = (err) => {
+			reject(err);
+		};
+		
+		stream.once('error', error_handle);
 
-		stream.on('data', chunk => {
-			body += chunk;
-		});
+		stream.once("readable",() => {
+			let data = "";
+			let chunk = null;
 
-		stream.on('end', () => {
+			while (null != (chunk = stream.read())) {
+				data += chunk;
+			}
+
 			try {
-				if(body.length)
-					resolve(JSON.parse(body));
-				else
-					resolve(({} as ReturnJSON));
-			} catch(err) {
+				if (data.length > 0) {
+					resolve(JSON.parse(data));
+				}
+				else {
+					resolve(<ReturnJSON>{})
+				}
+			}
+			catch(err) {
 				reject(err);
 			}
-		});
 
-		stream.on('error', err => {
-			reject(err);
+			stream.removeListener("error",error_handle);
 		});
-
-		if(stream.isPaused())
-			stream.resume();
 	} else {
 		resolve(null);
 	}

@@ -2,7 +2,6 @@ import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
 
 import {getUserData} from '../actions/users';
-import {default_permissions} from 'modules/variables';
 
 import {StdInput} from './Inputs';
 import UserPermissionGroup from './UserPermissionGroup';
@@ -132,7 +131,7 @@ class UserForm extends React.Component {
 	renderUserPermissions() {
 		let rtn = [];
 
-		for(let key in default_permissions) {
+		for(let key in {}) {
 			rtn.push(<UserPermissionGroup
 				key={`permission/${key}`}
 				title={key}

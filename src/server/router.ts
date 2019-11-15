@@ -1,9 +1,8 @@
-import Router, {Callback, RouteOptions} from "Router";
+import Router, {Callback, RouteOptions} from "router";
 import { ServerHttp2Stream, IncomingHttpHeaders } from "http2";
-import { URL } from "url";
 
 export interface AdditionalData {
-	url: URL
+	[key: string]: any
 }
 
 export type AppRouterArgs = [ServerHttp2Stream, IncomingHttpHeaders, number, AdditionalData];
