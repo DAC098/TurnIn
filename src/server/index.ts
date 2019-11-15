@@ -25,7 +25,9 @@ async function main() {
 
 	logger.info("loading database");
 
-	await import("./db");
+	const connect = (await import("./db")).default;
+
+	await connect();
 
 	logger.info("loading routes");
 

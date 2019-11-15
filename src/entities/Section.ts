@@ -1,14 +1,19 @@
 import typeorm from "typeorm"
-import { Semesters, ISection } from "./interfaces/ISection";
-import { IUser } from "./interfaces/IUser";
-import { IEnrollment } from "./interfaces/IEnrolled";
 
-export {Semesters} from "./interfaces/ISection";
+import { Assignment } from "./Assignment";
+import { User } from "./User";
+
+enum Semesters {
+	SPRING,
+	SUMMER,
+	WINTER,
+	FALL
+}
 
 @typeorm.Entity({
 	name: "sections"
 })
-export class Section implements ISection {
+export class Section {
 
 	@typeorm.PrimaryGeneratedColumn()
 	id: number;
@@ -38,10 +43,16 @@ export class Section implements ISection {
 	})
 	semester: Semesters;
 
-	@typeorm.OneToOne("User","id")
+	@typeorm.ManyToOne("User","id")
 	@typeorm.JoinColumn()
-	teacher: IUser;
+	teacher: User;
 	
-	@typeorm.OneToMany("Enrollment","section")
-	enrollment: IEnrollment;
+	@typeorm.ManyToMany("User","id")
+	@typeorm.JoinTable({
+		name: "enrollments"
+	})
+	enrolled: User[];
+
+	@typeorm.OneToMany("Assignment","section")
+	assignments: Assignment[];
 }

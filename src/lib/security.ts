@@ -19,9 +19,12 @@ export interface GenHashOptions {
 }
 
 export function genHash(to_hash: string, salt: string, options: GenHashOptions = {}) {
-	let hash = nCrypto.createHmac(options.hash_type, salt);
+	let hash_type = options.hash_type != null ? options.hash_type : HASH;
+	let digest_type = options.digest_type != null ? options.digest_type : BASE
+	
+	let hash = nCrypto.createHmac(hash_type, salt);
 	hash.update(to_hash);
-	return hash.digest(options.digest_type);
+	return hash.digest(digest_type);
 }
 
 export function uuidv5(name, namespace: number[] = NAMESPACE) {

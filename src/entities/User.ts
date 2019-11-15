@@ -1,11 +1,13 @@
 import typeorm from "typeorm"
-import { IEnrollment } from "./interfaces/IEnrolled";
-import { IUser } from "./interfaces/IUser";
+
+import { Submission } from "./Submission";
+import { DockerImage } from "./DockerImage";
+import { Section } from "./Section";
 
 @typeorm.Entity({
 	name: "users"
 })
-export class User implements IUser {
+export class User {
 
 	@typeorm.PrimaryGeneratedColumn()
 	id: number;
@@ -30,16 +32,30 @@ export class User implements IUser {
 
 	@typeorm.Column({
 		type: "varchar",
-		unique: true
+		unique: true,
+		nullable: true
 	})
 	email: string;
 	
-	@typeorm.Column()
+	@typeorm.Column({
+		nullable: true
+	})
 	fname: string;
 
-	@typeorm.Column()
+	@typeorm.Column({
+		nullable: true
+	})
 	lname: string;
 
-	@typeorm.OneToMany("Enrollment","user")
-	enrollment: IEnrollment;
+	@typeorm.ManyToMany("Section","id")
+	enrolled: Section[];
+
+	@typeorm.OneToMany("Submission","id")
+	submissions: Submission[];
+
+	@typeorm.OneToMany("DockerImage","id")
+	docker_images: DockerImage[];
+
+	@typeorm.OneToMany("Section","id")
+	teaching: Section[];
 }
