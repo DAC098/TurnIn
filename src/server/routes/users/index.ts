@@ -7,6 +7,7 @@ import router from "./router";
 import sendJSON from "app/lib/servers/response/json";
 import parseJSON from "app/lib/parsing/http/json";
 import { genSalt, genHash } from "app/lib/security";
+import { Section, DockerImage } from "app/entities";
 
 router.addRoute({
 	path: "/:id",
@@ -16,25 +17,19 @@ router.addRoute({
 	}
 }, async ([stream,headers,flags,data], route_data) => {
 	let user_repo = typeorm.getRepository(User);
-	let user_results = await user_repo.find({
-		relations: [
-			"enrolled",
-			"teaching",
-			"docker_images",
-			"docker_containers"
-		],
+	let user_results = await user_repo.findOne({
 		where: [
 			{id: route_data.params["id"]}
 		]
 	});
 
-	if (user_results.length === 0) {
+	if (user_results == null) {
 		sendJSON(stream,404,{message:"user not found"});
 
 		return false;
 	}
 
-	data["user"] = user_results[0];
+	data["user"] = user_results;
 });
 
 router.addRoute({
@@ -42,6 +37,21 @@ router.addRoute({
 	methods: "get"
 }, async ([stream,headers,flags,data], route_data) => {
 	let user = <User>data["user"];
+	let connection = typeorm.getConnection();
+
+	user.enrolled = await connection.createQueryBuilder()
+		.relation(User,"enrolled")
+		.of(user)
+		.loadMany();
+	user.teaching = await connection.createQueryBuilder()
+		.relation(User,"teaching")
+		.of(user)
+		.loadMany()
+	user.grading = await connection.createQueryBuilder()
+		.relation(User,"grading")
+		.of(user)
+		.loadMany();
+	
 	let rtn = {};
 	let exclude_keys = ["password","salt"];
 
@@ -52,7 +62,7 @@ router.addRoute({
 		rtn[key] = user[key];
 	}
 
-	sendJSON(stream,200,{data: rtn});
+	sendJSON(stream,200,{data: user});
 });
 
 router.addRoute({
@@ -93,9 +103,7 @@ router.addRoute({
 	methods: "get"
 }, async ([stream,headers,flags,data],route_data) => {
 	let user_repo = typeorm.getRepository(User);
-	let user_results = await user_repo.find({
-		select: ["id","username","email","fname","lname"]
-	});
+	let user_results = await user_repo.find();
 
 	sendJSON(stream,200,{data: user_results});
 });

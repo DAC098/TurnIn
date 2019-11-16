@@ -18,16 +18,20 @@ const head_string = `
 </script>
 <script type="application/javascript">
 const sendRequest = (method,path,body = {}) => {
-	let headers = {};
+	let headers = {
+		accept: "application/json"
+	};
 	let add_body = false;
 
-	if (method === "post" || method === "put") {
+	method = method.toUpperCase();
+
+	if (method === "POST" || method === "PUT") {
 		headers["content-type"] = "application/json"
 		add_body = true;
 	}
 
 	let options = {
-		method: method.toUpperCase(),
+		method,
 		headers
 	};
 

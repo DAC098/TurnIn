@@ -9,6 +9,7 @@ import { existsSync } from "app/lib/fs/common";
 import setup from "./setup";
 import logger from "./logger";
 import router from "./router";
+import * as handles from "./handles";
 
 function wait(msec: number) {
 	return new Promise(resolve => {
@@ -81,13 +82,7 @@ server.on("session", session => {
 					logger.warn("path not found but headers were sent");
 				}
 				else {
-					logger.debug("path not found");
-
-					stream.respond({
-						":status": 404,
-						"content-type": "text/plain"
-					});
-					stream.end("resource not found");
+					handles.notFound(stream,headers,flags);
 				}
 			}
 			else {
@@ -96,13 +91,7 @@ server.on("session", session => {
 						logger.warn("method not found but headers were sent");
 					}
 					else {
-						logger.debug("method not found");
-
-						stream.respond({
-							":status": 405,
-							"content-type": "text/plain"
-						});
-						stream.end("unhandled method");
+						handles.invalidMethod(stream,headers,flags);
 					}
 				}
 			}
@@ -114,11 +103,7 @@ server.on("session", session => {
 				stream.close(constants.NGHTTP2_INTERNAL_ERROR);
 			}
 			else {
-				stream.respond({
-					":status": 500,
-					"content-type": "text/plain"
-				});
-				stream.end("server error when processing request");
+				handles.serverError(stream,headers,flags,err);
 			}
 		}
 

@@ -1,7 +1,0 @@
----
-order:
-  - "id_middleware.js"
-  - "id.js"
-  - "id_assignments.js"
-  - "id_enrolled.js"
-...

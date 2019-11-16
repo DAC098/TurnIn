@@ -21,13 +21,15 @@ export class User {
 
 	@typeorm.Column({
 		type: "varchar",
-		nullable: false
+		nullable: false,
+		select: false
 	})
 	password: string;
 
 	@typeorm.Column({
 		type: "varchar",
 		nullable: false,
+		select: false
 	})
 	salt: string;
 
@@ -62,4 +64,7 @@ export class User {
 
 	@typeorm.OneToMany("Section","teacher")
 	teaching: Section[];
+
+	@typeorm.ManyToMany("Section","graders")
+	grading: Section[];
 }

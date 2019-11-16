@@ -43,9 +43,12 @@ export class Section {
 	})
 	semester: Semesters;
 
-	@typeorm.ManyToOne("User","id")
+	@typeorm.ManyToOne("User","teaching")
 	@typeorm.JoinColumn()
 	teacher: User;
+
+	@typeorm.OneToMany("Assignment","section")
+	assignments: Assignment[];
 	
 	@typeorm.ManyToMany("User","enrolled")
 	@typeorm.JoinTable({
@@ -53,6 +56,7 @@ export class Section {
 	})
 	enrolled: User[];
 
-	@typeorm.OneToMany("Assignment","section")
-	assignments: Assignment[];
+	@typeorm.ManyToMany("User","grading")
+	@typeorm.JoinTable()
+	graders: User[];
 }

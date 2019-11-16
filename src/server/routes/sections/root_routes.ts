@@ -34,6 +34,12 @@ router.addRoute({
 	let section = new Section();
 	let body = await parseJSON<NewSectionJSON>(stream);
 
+	if (body == null) {
+		sendJSON(stream,400,{message:"empty request body"});
+
+		return;
+	}
+
 	if (typeof body.teacher_id === "number") {
 		let user_result = await user_repo.findOne({id: body.teacher_id});
 
@@ -41,7 +47,7 @@ router.addRoute({
 			section.teacher = user_result;
 		}
 		else {
-			sendJSON(stream, 200, {
+			sendJSON(stream, 400, {
 				message:"failed to find the requested teacher",
 				teacher_id: body.teacher_id
 			});
@@ -55,7 +61,7 @@ router.addRoute({
 		typeof body.title !== "string" ||
 		typeof body.semester !== "string"
 	) {
-		sendJSON(stream,200,{
+		sendJSON(stream,400,{
 			message: "num, year, semester, and title are required for a section"
 		});
 
