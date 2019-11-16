@@ -77,6 +77,6 @@ export class DockerImage {
 	@typeorm.OneToMany("Submission","image")
 	submissions: Submission[];
 
-	@typeorm.ManyToMany("Assignment","id")
+	@typeorm.ManyToMany("Assignment","docker_images")
 	assignments: Assignment[];
 }

@@ -16,6 +16,35 @@ const head_string = `
 	window.__SERVER_SETUP__ = ${JSON.stringify(setup_obj)};
 	window.__ASSET_MANIFEST__ = ${JSON.stringify(manifest)};
 </script>
+<script type="application/javascript">
+const sendRequest = (method,path,body = {}) => {
+	let headers = {};
+	let add_body = false;
+
+	if (method === "post" || method === "put") {
+		headers["content-type"] = "application/json"
+		add_body = true;
+	}
+
+	let options = {
+		method: method.toUpperCase(),
+		headers
+	};
+
+	if (add_body) {
+		options["body"] = JSON.stringify(body);
+	}
+
+	return fetch(path, options);
+}
+
+const srh = (res) => {
+	if (res.headers.get("content-type").includes("application/json"))
+		return res.json();
+	else
+		return res.text();
+}
+</script>
 <script type="application/javascript" src="/assets/scripts/runtime.js"></script>
 `;
 

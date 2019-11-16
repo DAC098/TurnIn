@@ -4,10 +4,10 @@ import { Assignment } from "./Assignment";
 import { User } from "./User";
 
 export enum Semesters {
-	SPRING,
-	SUMMER,
-	WINTER,
-	FALL
+	SPRING = "spring",
+	SUMMER = "summer",
+	FALL = "fall",
+	WINTER = "winter"
 }
 
 @typeorm.Entity({

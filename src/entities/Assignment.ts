@@ -58,7 +58,7 @@ export class Assignment {
 	@typeorm.OneToMany("AssignmentFile","assignment")
 	files: AssignmentFile[];
 
-	@typeorm.ManyToMany("DockerImage","id")
+	@typeorm.ManyToMany("DockerImage","assignments")
 	@typeorm.JoinTable({
 		name: "assignments_to_images"
 	})
