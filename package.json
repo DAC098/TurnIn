@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "ajv": "^6.10.2",
     "app": "file:dist",
     "casbin": "^3.0.6",
     "chalk": "^2.4.2",

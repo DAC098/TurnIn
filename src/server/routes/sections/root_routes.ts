@@ -48,7 +48,7 @@ router.addRoute({
 		}
 		else {
 			sendJSON(stream, 400, {
-				message:"failed to find the requested teacher",
+				message: "failed to find the requested teacher",
 				teacher_id: body.teacher_id
 			});
 
